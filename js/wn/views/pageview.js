@@ -3,7 +3,7 @@ wn.provide('wn.views.pageview');
 wn.views.pageview = {
 	pages: {},
 	with_page: function(name, callback) {
-		if(!locals.Page[name]) {
+		if(!wn.model.has('Page', name)) {
 			wn.call({
 				method: 'webnotes.widgets.page.getpage', 
 				args: {'name':name },
@@ -30,14 +30,14 @@ wn.views.Page = Class.extend({
 	init: function(name) {
 		this.name = name;
 		var me = this;
-		this.pagedoc = locals.Page[this.name];
+		this.pagedoc = wn.model.get('Page', this.name);
 		this.wrapper = wn.container.add_page(this.name);
-		this.wrapper.label = this.pagedoc.title || this.pagedoc.name;
+		this.wrapper.label = this.pagedoc.get('title', this.pagedoc.get('name'));
 		
 		// set content, script and style
-		this.wrapper.innerHTML = this.pagedoc.content;
-		wn.dom.eval(this.pagedoc.__script || this.pagedoc.script || '');
-		wn.dom.set_style(this.pagedoc.style || '');
+		this.wrapper.innerHTML = this.pagedoc.get('content');
+		wn.dom.eval(this.pagedoc.get('__script', ''));
+		wn.dom.set_style(this.pagedoc.get('style', ''));
 		
 		this.trigger('onload');
 		

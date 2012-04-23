@@ -11,7 +11,12 @@ wn.route = function() {
 
 	wn._cur_route = window.location.hash;
 
-	route = wn.get_route();	
+	var page_name = wn.get_route_str();
+	
+	if(wn.pages[page_name]) // loaded
+		wn.container.change_to(page_name);
+	
+	var route = wn.get_route();	
 	
 	switch (route[0]) {
 		case "List":

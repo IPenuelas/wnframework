@@ -20,35 +20,6 @@
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-wn.views.reportview = {
-	show: function(dt, rep_name) {
-		wn.require('lib/js/legacy/report.compressed.js');
-		dt = get_label_doctype(dt);
-
-		if(!_r.rb_con) {
-			// first load
-			_r.rb_con = new _r.ReportContainer();
-		}
-
-		_r.rb_con.set_dt(dt, function(rb) { 
-			if(rep_name) {
-				var t = rb.current_loaded;
-				rb.load_criteria(rep_name);
-
-				// if loaded, then run
-				if((rb.dt) && (!rb.dt.has_data() || rb.current_loaded!=t)) {
-					rb.dt.run();
-				}
-			}
-
-			// show
-			if(!rb.forbidden) {
-				wn.container.change_to('Report Builder');
-			}
-		} );
-	}
-}
-
 // Routing Rules
 // --------------
 // `Report` shows list of all pages from which you can start a report + all saved reports
@@ -56,18 +27,13 @@ wn.views.reportview = {
 // `Report/[doctype]` shows report for that doctype
 // `Report/[doctype]/[report_name]` loads report with that name
 
-wn.views.reportview2 = {
+wn.views.reportview = {
 	show: function(dt) {
-		var page_name = wn.get_route_str();
-		if(wn.pages[page_name]) {
-			wn.container.change_to(wn.pages[page_name]);
+		var route = wn.get_route();
+		if(route[1]) {
+			new wn.views.ReportView(route[1], route[2]);				
 		} else {
-			var route = wn.get_route();
-			if(route[1]) {
-				new wn.views.ReportView(route[1], route[2]);				
-			} else {
-				new wn.views.ReportHome();
-			}
+			wn.set_route('404');
 		}
 	}
 }
@@ -75,7 +41,6 @@ wn.views.reportview2 = {
 wn.views.ReportView = wn.ui.Listing.extend({
 	init: function(doctype, docname) {
 		var me = this;
-		this.page_name = wn.get_route_str();
 		this.import_slickgrid();
 		this.doctype = doctype;
 		this.docname = docname;
@@ -87,7 +52,7 @@ wn.views.ReportView = wn.ui.Listing.extend({
 			me.setup();
 			if(docname) {
 				wn.model.with_doc('Report', docname, function(r) {
-					me.set_columns_and_filters(JSON.parse(locals['Report'][docname].json));
+					me.set_columns_and_filters(JSON.parse(wn.model.get('Report', docname).get('json')));
 					me.run();
 				});
 			} else {
@@ -104,10 +69,11 @@ wn.views.ReportView = wn.ui.Listing.extend({
 		wn.dom.set_style('.slick-cell { font-size: 12px; }');
 	},
 	make_page: function() {
-		this.page = wn.container.add_page(this.page_name);
+		var page_name = wn.get_route_str();
+		this.page = wn.container.add_page(page_name);
 		wn.ui.make_app_page({parent:this.page, 
 			single_column:true});
-		wn.container.change_to(this.page_name);
+		wn.container.change_to(page_name);
 	},
 	set_init_columns: function() {
 		// pre-select mandatory columns
@@ -122,7 +88,7 @@ wn.views.ReportView = wn.ui.Listing.extend({
 	setup: function() {
 		var me = this;
 		wn.views.breadcrumbs($('<span>').appendTo(this.page.appframe.$titlebar), 
-			locals.DocType[this.doctype].module);
+			wn.model.get('DocType', this.doctype).get('module'));
 		this.make({
 			title: 'Report: ' + (this.docname ? (this.doctype + ' - ' + this.docname) : this.doctype),
 			appframe: this.page.appframe,

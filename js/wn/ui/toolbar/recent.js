@@ -58,7 +58,7 @@ wn.ui.toolbar.RecentDocs = Class.extend({
 		}
 	},
 	istable: function(dt) {
-		return locals.DocType[dt] && locals.DocType[dt].istable || false;
+		return wn.model.get_value('DocType', dt, 'istable');
 	},
 	remove: function(dt, dn) {
 		$(repl('#toolbar-recent li[data-docref="%(dt)s/%(dn)s"]', {dt:dt, dn:dn})).remove();

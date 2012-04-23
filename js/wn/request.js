@@ -72,7 +72,7 @@ wn.request.cleanup = function(opts, r) {
 	}
 
 	// sync docs
-	if(r.docs) LocalDB.sync(r.docs);
+	if(r.docs) wn.model.sync(expand_doclist(r.docs));
 }
 
 wn.request.call = function(opts) {

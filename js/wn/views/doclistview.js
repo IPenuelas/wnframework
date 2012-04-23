@@ -24,19 +24,14 @@ wn.provide('wn.views.doclistview');
 wn.provide('wn.doclistviews');
 
 wn.views.doclistview.show = function(doctype) {
-	var page_name = wn.get_route_str();
-	if(wn.pages[page_name]) {
-		wn.container.change_to(wn.pages[page_name]);
-	} else {
-		var route = wn.get_route();
-		if(route[1]) {
-			wn.model.with_doctype(route[1], function(r) {
-				if(r && r['403']) {
-					return;
-				}
-				new wn.views.DocListView(route[1]);
-			});
-		}
+	var route = wn.get_route();
+	if(route[1]) {
+		wn.model.with_doctype(route[1], function(r) {
+			if(r && r['403']) {
+				return;
+			}
+			new wn.views.DocListView(route[1]);
+		});
 	}
 }
 
@@ -76,13 +71,14 @@ wn.views.DocListView = wn.ui.Listing.extend({
 		</div>', {label: this.label}));
 		
 		this.appframe = new wn.ui.AppFrame(this.$page.find('.appframe-area'));
-		wn.views.breadcrumbs($('<span>').appendTo(this.appframe.$titlebar), locals.DocType[this.doctype].module);
+		wn.views.breadcrumbs($('<span>').appendTo(this.appframe.$titlebar), 
+			wn.model.get('DocType', this.doctype).get('module'));
 	},
 
 	setup: function() {
 		var me = this;
 		me.can_delete = wn.model.can_delete(me.doctype);
-		me.meta = locals.DocType[me.doctype];
+		me.meta = wn.model.get('DocType', me.doctype);
 		me.$page.find('.wnlist-area').empty(),
 		me.setup_docstatus_filter();
 		me.setup_listview();
@@ -101,9 +97,8 @@ wn.views.DocListView = wn.ui.Listing.extend({
 	},
 	setup_docstatus_filter: function() {
 		var me = this;
-		this.can_submit = $.map(locals.DocPerm, function(d) { 
-			if(d.parent==me.meta.name && d.submit) return 1
-			else return null; 
+		this.can_submit = me.meta.each({doctype:'DocPerm'}, function(doc) {
+			return doc.get('submit') ? 1 : null;
 		}).length;
 		if(this.can_submit) {
 			this.$page.find('.show-docstatus').removeClass('hide');
@@ -113,8 +108,8 @@ wn.views.DocListView = wn.ui.Listing.extend({
 		}
 	},
 	setup_listview: function() {
-		if(this.meta.__listjs) {
-			eval(this.meta.__listjs);
+		if(this.meta.get('__listjs')) {
+			eval(this.meta.get('__listjs'));
 			this.listview = new wn.doclistviews[this.doctype](this);
 		} else {
 			this.listview = new wn.views.ListView(this);
@@ -148,7 +143,7 @@ wn.views.DocListView = wn.ui.Listing.extend({
 		</p></div>', {
 			doctype_label: get_doctype_label(this.doctype),
 			doctype: this.doctype,
-			description: wn.markdown(locals.DocType[this.doctype].description || '')
+			description: wn.markdown(me.meta.get('description') || '')
 		});
 	},
 	render_row: function(row, data) {

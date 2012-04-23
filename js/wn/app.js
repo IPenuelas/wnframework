@@ -41,7 +41,7 @@ wn.Application = Class.extend({
 		wn.route();
 	},
 	load_bootinfo: function() {
-		LocalDB.sync(wn.boot.docs);
+		wn.model.sync(expand_doclist(wn.boot.docs));
 		wn.control_panel = wn.boot.control_panel;
 		
 		if(wn.boot.error_messages)
