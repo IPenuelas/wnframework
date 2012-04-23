@@ -42,7 +42,4 @@ wn.PageLayout = function(args) {
 	this.main_head 		= $a(this.main, 'div', 'form-title');
 	this.body 			= $a(this.main, 'div');
 	this.footer 		= $a(this.main, 'div');
-	if(this.heading) {
-		this.page_head = new PageHeader(this.head, this.heading);
-	}
 }

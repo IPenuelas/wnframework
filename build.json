@@ -35,14 +35,6 @@
 			"lib/js/wn/ui/toolbar/toolbar.js"
 		]	
 	},
-	
-	{
-		"lib/js/legacy/report.compressed.js": [
-			"lib/js/legacy/widgets/report_builder/report_builder.js",
-			"lib/js/legacy/widgets/report_builder/datatable.js",
-			"lib/js/legacy/widgets/report_builder/calculator.js"
-		]
-	},
 
 	{
 		"css/all-web.css": [
@@ -79,7 +71,6 @@
 			"lib/css/legacy/listing.css",
 			"lib/css/legacy/report.css",
 			"lib/css/legacy/dialog.css",
-			"lib/css/legacy/tabs.css",
 			"lib/css/legacy/sidebar.css",
 			"lib/css/Aristo/aristo.selected.css",
 			"lib/css/ui/common.css",
@@ -103,7 +94,6 @@
 			"lib/js/wn/ui/appframe.js",
 			"lib/js/wn/ui/dialog.js",
 			"lib/js/legacy/widgets/dialog.js",
-			"lib/js/legacy/webpage/page_header.js",
 			"lib/js/legacy/webpage/spinner.js",
 			"lib/js/legacy/webpage/loaders.js",
 			"lib/js/legacy/wn/widgets/footer.js",
@@ -137,8 +127,6 @@
 			"lib/js/wn/ui/button.js",
 			"lib/js/legacy/widgets/dialog.js",
 			"lib/js/legacy/widgets/layout.js",
-			"lib/js/legacy/widgets/tabbedpage.js",
-			"lib/js/legacy/webpage/page_header.js",
 			"lib/js/legacy/widgets/tags.js",
 			"lib/js/legacy/widgets/export_query.js",
 			"lib/js/legacy/webpage/search.js",
