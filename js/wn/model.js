@@ -91,6 +91,11 @@ wn.model = {
 		var doc = wn.model.get(dt, dn);
 		if(doc) return doc.get(fieldname);
 		else return null;
+	},
+	// change event
+	event_name: function(dt, dn) {
+		return 'change-'+dt.replace(/ /g, '_')+'-' + dn.replace(/ /g, '_');
+		
 	}
 }
 
@@ -104,7 +109,7 @@ wn.model.Document = Class.extend({
 	},
 	set: function(key, val) {
 		this.fields[key] = val;
-		$(document).trigger('change-'+this.fields.doctype+'-'+this.fields.name, key, val);
+		$(document).trigger(wn.model.event_name(this.get('doctype'), this.get('name')), [key, val]);
 	}
 });
 

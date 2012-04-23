@@ -24,70 +24,88 @@ wn.views.formview = {
 	}
 }
 
-wn.views.FormView = Class.extend({
-	init: function(doctype, name) {
-		this.doctype = doctype;
-		this.name = name;
-		this.meta = wn.model.get('DocType', doctype);
-		this.doc = wn.model.get(doctype, name);
-		this.make_page();
-		this.make_form();
-	},
-	make_page: function() {
-		var page_name = wn.get_route_str();
-		this.page = wn.container.add_page(page_name);
-		wn.ui.make_app_page({parent:this.page});
-		wn.container.change_to(page_name);
-		this.wrapper = $(this.page).find('.layout-main-section');
+// build a form from a set of fields
+wn.ui.Form = Class.extend({
+	init: function(opts) {
+		$.extend(this, opts);
 	},
 	make_form: function() {
 		// form
 		var me = this;
-		this.$form = $('<form class="form-horizontal">').appendTo(this.wrapper);
+		this.$form = $('<form class="form-horizontal">').appendTo(this.$w);
 		
-		if(this.meta.get('DocField', {})[0].get('fieldtype')!='Section Break') {
+		if(this.fields[0].fieldtype!='Section Break') {
 			me.make_fieldset('_first_section');
 		}
-
-		// fieldsets
-		this.meta.each('DocField', {fieldtype:'Section Break'}, function(df) {
-			me.make_fieldset(df.get('fieldname'), df.get('label'));
-		});
 		
 		// controls
-		var fieldset = '_first_section';
-		this.meta.each('DocField', function(df) {
-
+		$.each(this.fields, function(i, df) {
 			// change section
-			if(df.get('fieldtype')=='Section Break') {
-				fieldset = df.get('fieldname');
+			if(df.fieldtype=='Section Break') {
+				me.make_fieldset(df.fieldname, df.label);
 			} else {
 				// make control 
-				wn.ui.make_control({
-					docfield: df.fields,
-					parent: me.$form.find('fieldset[data-name="'+fieldset+'"]')
-				});		
+				me.controls[df.fieldname] = wn.ui.make_control({
+					docfield: df,
+					parent: me.last_fieldset,
+					doctype: me.doctype,
+					docname: me.name
+				});
 			}
-		})
+		});
 	},
 	make_fieldset: function(name, legend) {
 		var $fset = $('<fieldset data-name="'+name+'"></fieldset>').appendTo(this.$form);
 		if(legend) {
 			$('<legend>').text(legend).appendTo($fset);
 		}
+		this.last_fieldset = $fset;
+	},
+	// listen for changes in model
+	listen: function() {
+		var me = this;
+		if(this.doctype && this.name) {
+			$(document).bind(wn.model.event_name(this.doctype, this.name), function(ev, key, val) {
+				if(me.controls[key]) me.controls[key].set(val);
+			});
+		}
+	}
+});
+
+wn.views.FormView = wn.ui.Form.extend({
+	init: function(doctype, name) {
+		this.doctype = doctype;
+		this.name = name;
+		this.meta = wn.model.get('DocType', doctype);
+		this.doc = wn.model.get(doctype, name);
+		this.controls = {};
+		this.fields = $.map(this.meta.get('DocField', {}), function(d) { return d.fields; });
+		this.make_page();
+		this.make_form();
+		this.listen();
+	},
+	make_page: function() {
+		var page_name = wn.get_route_str();
+		this.page = wn.container.add_page(page_name);
+		wn.ui.make_app_page({parent:this.page});
+		wn.container.change_to(page_name);
+		this.$w = $(this.page).find('.layout-main-section');
 	}
 });
 
 wn.ui.make_control = function(opts) {
 	control_map = {
-		'Data': wn.ui.Control,
 		'Check': wn.ui.CheckControl,
-		'Text': wn.ui.TextControl,
+		'Data': wn.ui.Control,
+		'Link': wn.ui.LinkControl,
 		'Select': wn.ui.SelectControl,
-		'Table': wn.ui.GridControl
+		'Table': wn.ui.GridControl,
+		'Text': wn.ui.TextControl
 	}
 	if(control_map[opts.docfield.fieldtype]) {
-		new control_map[opts.docfield.fieldtype](opts);
+		return new control_map[opts.docfield.fieldtype](opts);
+	} else {
+		return null;		
 	}
 }
 
@@ -97,9 +115,18 @@ wn.ui.Control = Class.extend({
 		this.make_body();
 		this.make_input();
 		this.$w.find('.control-label').text(this.docfield.label);
+		this.set_init_value();
+	},
+	set_init_value: function() {
+		if(this.doctype && this.docname) {
+			this.set(wn.model.get_value(this.doctype, this.docname, this.docfield.fieldname));
+		}
+	},
+	set: function(val) {
+		this.$input.val(val)
 	},
 	make_input: function() {
-		this.$input = $('<input type="text">').appendTo(this.$w.find('.controls'));		
+		this.$input = $('<input type="text">').appendTo(this.$w.find('.controls'));
 	},
 	make_body: function() {
 		this.$w = $('<div class="control-group">\
@@ -130,16 +157,40 @@ wn.ui.SelectControl = wn.ui.Control.extend({
 	}
 });
 
+wn.ui.LinkControl = wn.ui.Control.extend({
+	make_input: function() {
+		this.$input_wrap = $('<div class="input-append">').appendTo(this.$w.find('.controls'));
+		this.$input = $('<input type="text" />').appendTo(this.$input_wrap);
+		$('<button class="btn"><i class="icon-search"></i></button>').appendTo(this.$input_wrap);
+	}
+});
+
 wn.ui.GridControl = Class.extend({
 	init: function(opts) {
+		$.extend(this, opts);
+		this.tabletype = this.docfield.options;
 		wn.lib.import_slickgrid();
-		
-		var width = $(opts.parent).parent('form:first').width();
+		this.make();
+		this.set();
+	},
+	make: function() {
+		var width = $(this.parent).parent('form:first').width();
 		this.$w = $('<div style="height: 300px; border: 1px solid grey;"></div>')
-			.appendTo(opts.parent)
+			.appendTo(this.parent)
 			.css('width', width);
 			
-		var columns = $.map(wn.model.get('DocType', opts.docfield.options).get({doctype:'DocField'}), 
+
+		var options = {
+			enableCellNavigation: true,
+			enableColumnReorder: false
+		};
+		
+		this.grid = new Slick.Grid(this.$w.get(0), [], 
+			this.get_columns(), options);
+		
+	},
+	get_columns: function() {
+		var columns = $.map(wn.model.get('DocType', this.tabletype).get({doctype:'DocField'}), 
 			function(d) {
 				return {
 					id: d.get('fieldname'),
@@ -149,14 +200,15 @@ wn.ui.GridControl = Class.extend({
 				}
 			}
 		);
-		columns = [{id:'idx', field:'idx', name:'Sr', width: 40}].concat(columns);
-
-		var options = {
-			enableCellNavigation: true,
-			enableColumnReorder: false
-		};
-		
-		var grid = new Slick.Grid(this.$w.get(0), [], 
-			columns, options);
+		return [{id:'idx', field:'idx', name:'Sr', width: 40}].concat(columns);
+	},
+	set: function(val) {
+		// refresh values from doclist
+		var rows = wn.model.get(this.docfield.parenttype, this.docname)
+			.get({parentfield:this.docfield.fieldname});
+			
+		this.grid.setData($.map(rows, 
+			function(d) { return d.fields; }));
+		this.grid.render();
 	}
 })
