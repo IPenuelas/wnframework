@@ -39,3 +39,13 @@ wn.require = function(items) {
 		//}
 	}
 }
+
+wn.provide('wn.lib');
+wn.lib.import_slickgrid = function() {
+	wn.require('lib/js/lib/slickgrid/slick.grid.css');
+	wn.require('lib/js/lib/slickgrid/slick-default-theme.css');
+	wn.require('lib/js/lib/slickgrid/jquery.event.drag.min.js');
+	wn.require('lib/js/lib/slickgrid/slick.core.js');
+	wn.require('lib/js/lib/slickgrid/slick.grid.js');
+	wn.dom.set_style('.slick-cell { font-size: 12px; }');	
+}

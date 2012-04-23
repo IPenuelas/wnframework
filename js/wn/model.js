@@ -136,25 +136,44 @@ wn.model.DocList = Class.extend({
 		}
 	},
 	// usage:
-	// doclist.each(filters, fn);
+	// doclist.each(doctype, filters, fn)
+	// doclist.each(filters/doctype, fn);
 	// doclist.each(fn);
 	//
 	// example:
 	// doclist.each({"doctype":"DocField", "fieldtype":"Table"}, function(d) {})
+	// doclist.each('DocField', function(d) { })
 	each: function() {
 		if(typeof arguments[0]=='function') {
+			var fn = arguments[0];
 			$.each(this.doclist, function(i, doc) { fn(doc); })
+		} else if(typeof arguments[1]=='function') {
+			var fn = arguments[1];
+			if(typeof arguments[0]=='string') {
+				$.each(this.get({doctype:arguments[0]}), function(i, doc) { fn(doc); });				
+			} else {
+				$.each(this.get(arguments[0]), function(i, doc) { fn(doc); });				
+			}
 		} else {
-			$.each(this.get(arguments[0]), function(i, doc) { fn(doc); });
+			var fn = arguments[2];
+			$.each(this.get(arguments[0], arguments[1]), function(i, doc) { fn(doc); });
 		}
 	},
-	get: function(args, ifnull) {
+	// usage:
+	// doclist.get(doctype, filters) => filtered doclist
+	// doclist.get(filters) => filtered doclist
+	// doclist.get(fieldname) => value of main doc
+	get: function() {
 		var me = this;
-		if(typeof args=='string') {
-			return this.doc.get(args, ifnull);
+		if(typeof arguments[0]=='string' && typeof arguments[1]=='object') {
+			var filters = arguments[1];
+			filters.doctype = arguments[0];
+		} else if(typeof arguments[0]=='object') {
+			var filters = arguments[0];
 		} else {
-			return $.map(this.doclist, function(d) { return me.match(args, d) });			
+			return this.doc.get(arguments[0], arguments[1]);
 		}
+		return $.map(this.doclist, function(d) { return me.match(filters, d) });
 	},
 	match: function(filters, doc) {
 		for(key in filters) {
