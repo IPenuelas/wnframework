@@ -97,7 +97,7 @@ wn.views.DocListView = wn.ui.Listing.extend({
 	},
 	setup_docstatus_filter: function() {
 		var me = this;
-		this.can_submit = me.meta.each({doctype:'DocPerm'}, function(doc) {
+		this.can_submit = $.map(me.meta.get({doctype:'DocPerm'}), function(doc) {
 			return doc.get('submit') ? 1 : null;
 		}).length;
 		if(this.can_submit) {
@@ -125,7 +125,6 @@ wn.views.DocListView = wn.ui.Listing.extend({
 			start: 0,
 			page_length: 20,
 			show_filters: true,
-			show_grid: true,
 			new_doctype: this.doctype,
 			allow_delete: true,
 			no_result_message: this.make_no_result(),
@@ -143,7 +142,7 @@ wn.views.DocListView = wn.ui.Listing.extend({
 		</p></div>', {
 			doctype_label: get_doctype_label(this.doctype),
 			doctype: this.doctype,
-			description: wn.markdown(me.meta.get('description') || '')
+			description: wn.markdown(this.meta.get('description') || '')
 		});
 	},
 	render_row: function(row, data) {

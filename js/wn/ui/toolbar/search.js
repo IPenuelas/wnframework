@@ -27,15 +27,10 @@ wn.ui.toolbar.Search = wn.ui.toolbar.SelectorDialog.extend({
 		this._super({
 			title: "Search",
 			execute: function(val) {
-				selector.set_search(val);
-				selector.show();
+				new wn.ui.Search({doctype:val});
 			},
 		});
-		
 		// get new types
-		this.set_values(profile.can_search.join(',').split(','));
-		
-		// global search selector
-		makeselector();
+		this.set_values(profile.can_search.join(',').split(','));		
 	}
 });

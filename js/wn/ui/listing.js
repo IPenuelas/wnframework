@@ -41,6 +41,8 @@
 
 //   no_result_message ("No result")
 
+//   style: compact
+
 //   page_length (20)
 //   hide_refresh (False)
 //   no_toolbar
@@ -86,7 +88,7 @@ wn.ui.Listing = Class.extend({
 				<div class="list-filters hide">\
 					<div class="show_filters well">\
 						<div class="filter_area"></div>\
-						<div>\
+						<div class="clear">\
 							<button class="btn btn-small add-filter-btn">\
 								<i class="icon-plus"></i> Add Filter</button>\
 						</div>\
@@ -193,6 +195,9 @@ wn.ui.Listing = Class.extend({
 			doctype: this.doctype,
 			filter_fields: this.filter_fields
 		});
+		if(this.style=='compact') {
+			this.$w.find('.show_filters').addClass('compact');
+		}
 	},
 
 	clear: function() {

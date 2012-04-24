@@ -22,7 +22,6 @@
 
 wn.ui.FilterList = Class.extend({
 	init: function(opts) {
-		wn.require('lib/js/legacy/widgets/form/fields.js');
 		$.extend(this, opts);
 		this.filters = [];
 		this.$w = this.$parent;
@@ -53,7 +52,7 @@ wn.ui.FilterList = Class.extend({
 		
 		// list must be expanded
 		if(fieldname) {
-			this.$w.find('.show_filters').slideDown();
+			this.$w.find('.show_filters').toggle(true);
 		}
 	},
 	
@@ -78,7 +77,7 @@ wn.ui.FilterList = Class.extend({
 	
 	get_filter: function(fieldname) {
 		for(var i in this.filters) {
-			if(this.filters[i].field.df.fieldname==fieldname)
+			if(this.filters[i].field.docfield.fieldname==fieldname)
 				return this.filters[i];
 		}
 	}
@@ -125,7 +124,7 @@ wn.ui.Filter = Class.extend({
 
 		this.$w.find('a.close').bind('click', function() { 
 			me.$w.css('display','none');
-			var value = me.field.get_value();
+			var value = me.field.get();
 			me.field = null;
 			if(!me.flist.get_filters().length) {
 				me.flist.$w.find('.set_filters').toggle(true);
@@ -141,12 +140,10 @@ wn.ui.Filter = Class.extend({
 		// add help for "in" codition
 		me.$w.find('.condition').change(function() {
 			if($(this).val()=='in') {
-				me.set_field(me.field.df.fieldname, 'Data');
-				if(!me.field.desc_area)
-					me.field.desc_area = $a(me.field.wrapper, 'span', 'help', null,
-						'values separated by comma');				
+				me.set_field(me.field.docfield.fieldname, 'Data');
+				me.field.help_block('values separated by comma');
 			} else {
-				me.set_field(me.field.df.fieldname);				
+				me.set_field(me.field.docfield.fieldname);				
 			}
 		});
 		
@@ -164,7 +161,7 @@ wn.ui.Filter = Class.extend({
 		// presents given (could be via tags!)
 		this.set_field(fieldname);
 		if(condition) this.$w.find('.condition').val(condition).change();
-		if(value) this.field.set_input(value)
+		if(value) this.field.set(value)
 		
 	},
 	
@@ -173,11 +170,14 @@ wn.ui.Filter = Class.extend({
 		
 		// set in fieldname (again)
 		var cur = me.field ? {
-			fieldname: me.field.df.fieldname,
-			fieldtype: me.field.df.fieldtype
+			fieldname: me.field.docfield.fieldname,
+			fieldtype: me.field.docfield.fieldtype
 		} : {}
 
 		var df = me.fieldselect.fields_by_name[fieldname];
+		if(!df) {
+			console.log('Filter: unable to select ' + fieldname);
+		}
 		this.set_fieldtype(df, fieldtype);
 			
 		// called when condition is changed, 
@@ -190,15 +190,15 @@ wn.ui.Filter = Class.extend({
 		me.fieldselect.$select.val(fieldname);
 		var field_area = me.$w.find('.filter_field').empty().get(0);
 		f = make_field(df, null, field_area, null, 0, 1);
-		f.df.single_select = 1;
-		f.not_in_form = 1;
-		f.with_label = 0;
-		f.refresh();
+		f = wn.ui.make_control({docfield: df, parent:field_area, no_label: true});		
+		f.docfield.single_select = 1;
 		me.field = f;
+		me.field.$w.css('float','left');
+		me.field.$input.addClass('input-medium');
 		
 		this.set_default_condition(df, fieldtype);
 		
-		$(me.field.wrapper).find(':input').keydown(function(ev) {
+		$(me.field.$w).find(':input').keydown(function(ev) {
 			if(ev.which==13) {
 				me.flist.listobj.run();
 			}
@@ -242,10 +242,10 @@ wn.ui.Filter = Class.extend({
 	
 	get_value: function() {
 		var me = this;
-		var val = me.field.get_value();
+		var val = me.field.get();
 		var cond = me.$w.find('.condition').val();
 		
-		if(me.field.df.original_type == 'Check') {
+		if(me.field.docfield.original_type == 'Check') {
 			val = (val=='Yes' ? 1 :0);
 		}
 		
@@ -254,7 +254,7 @@ wn.ui.Filter = Class.extend({
 		}
 		
 		return [me.fieldselect.$select.find('option:selected').attr('table'), 
-			me.field.df.fieldname, me.$w.find('.condition').val(), cstr(val)];
+			me.field.docfield.fieldname, me.$w.find('.condition').val(), cstr(val)];
 	}
 
 });

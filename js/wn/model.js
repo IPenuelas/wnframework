@@ -92,6 +92,9 @@ wn.model = {
 		if(doc) return doc.get(fieldname);
 		else return null;
 	},
+	set_value: function(dt, dn, fieldname, value) {
+		wn.model.get(dt, dn).doc.set(fieldname, value);
+	},
 	// change event
 	event_name: function(dt, dn) {
 		return 'change-'+dt.replace(/ /g, '_')+'-' + dn.replace(/ /g, '_');

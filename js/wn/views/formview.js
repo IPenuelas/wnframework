@@ -66,7 +66,7 @@ wn.ui.Form = Class.extend({
 		var me = this;
 		if(this.doctype && this.name) {
 			$(document).bind(wn.model.event_name(this.doctype, this.name), function(ev, key, val) {
-				if(me.controls[key]) me.controls[key].set(val);
+				if(me.controls[key]) me.controls[key].set_input(val);
 			});
 		}
 	}
@@ -116,14 +116,27 @@ wn.ui.Control = Class.extend({
 		this.make_input();
 		this.$w.find('.control-label').text(this.docfield.label);
 		this.set_init_value();
+		if(this.no_label) {
+			this.$w.find('.control-label').toggle(false);
+		}
 	},
 	set_init_value: function() {
 		if(this.doctype && this.docname) {
-			this.set(wn.model.get_value(this.doctype, this.docname, this.docfield.fieldname));
+			this.set_input(wn.model.get_value(this.doctype, this.docname, this.docfield.fieldname));
 		}
 	},
+	set_input: function(val) {
+		this.$input.val(val);
+	},
 	set: function(val) {
-		this.$input.val(val)
+		if(this.doctype && this.docname) {
+			wn.model.set_value(this.doctype, this.docname, this.docfield.fieldname, val);
+		} else {
+			this.set_input(val);
+		}		
+	},
+	get: function() {
+		return this.$input.val();
 	},
 	make_input: function() {
 		this.$input = $('<input type="text">').appendTo(this.$w.find('.controls'));
@@ -134,6 +147,12 @@ wn.ui.Control = Class.extend({
 			<div class="controls">\
 			</div>\
 			</div>').appendTo(this.parent);
+	},
+	help_block: function(text) {
+		if(!this.$w.find('.help-block').length) {
+			this.$w.find('.controls').append('<div class="help-block">');
+		}
+		this.$w.find('.help-block').text(text);
 	}
 });
 
@@ -159,9 +178,19 @@ wn.ui.SelectControl = wn.ui.Control.extend({
 
 wn.ui.LinkControl = wn.ui.Control.extend({
 	make_input: function() {
+		var me = this;
 		this.$input_wrap = $('<div class="input-append">').appendTo(this.$w.find('.controls'));
 		this.$input = $('<input type="text" />').appendTo(this.$input_wrap);
-		$('<button class="btn"><i class="icon-search"></i></button>').appendTo(this.$input_wrap);
+		$('<button class="btn"><i class="icon-search"></i></button>')
+			.appendTo(this.$input_wrap)
+			.click(function() {
+				new wn.ui.Search({
+					doctype: me.docfield.options,
+					callback: function(val) {
+						me.set(val);
+					}
+				});
+			});
 	}
 });
 
