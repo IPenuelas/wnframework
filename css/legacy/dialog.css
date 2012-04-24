@@ -6,9 +6,9 @@ div.dialog_wrapper {
 	display: none;
 	z-index: 90;
 	background-color: #FFF;
-	box-shadow:1px 1px 8px #444;
-	-moz-box-shadow: 1px 1px 8px #444;
-	-webkit-box-shadow: 1px 1px 8px #444;
+	box-shadow:1px 1px 11px #222;
+	-moz-box-shadow: 1px 1px 11px #222;
+	-webkit-box-shadow: 1px 1px 11px #222;
 	
 	border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -38,7 +38,7 @@ div.dialog_back {
 	left: 0px;
 	bottom: 0px;
 	right: 0px;
-	background-color: #aaa;
+	background-color: #999;
 	opacity: 0.6;
 	z-index: 50;
 	text-align: center;
