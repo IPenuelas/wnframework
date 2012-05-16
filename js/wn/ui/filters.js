@@ -189,7 +189,6 @@ wn.ui.Filter = Class.extend({
 		// clear field area and make field
 		me.fieldselect.$select.val(fieldname);
 		var field_area = me.$w.find('.filter_field').empty().get(0);
-		f = make_field(df, null, field_area, null, 0, 1);
 		f = wn.ui.make_control({docfield: df, parent:field_area, no_label: true});		
 		f.docfield.single_select = 1;
 		me.field = f;

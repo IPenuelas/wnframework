@@ -13,8 +13,14 @@ wn.views.formview = {
 					wn.container.change_to('404');
 					return;
 				}
+
+				var page_name = wn.get_route_str();
+				if(wn.pages[page_name]) {
+					wn.container.change_to(page_name);
+				} else {
+					new wn.views.FormView(dt, dn);					
+				}
 				
-				new wn.views.FormView(dt, dn);
 			});
 		})
 	},
@@ -24,15 +30,41 @@ wn.views.formview = {
 	}
 }
 
+wn.views.FormView = Class.extend({
+	init: function(doctype, name) {
+		this.make_page();
+		wn.views.breadcrumbs($(this.page).find('.appframe-title'), 
+			wn.model.get_value('DocType', doctype, 'module'), doctype, name);
+		this.form = new wn.ui.Form({
+			doctype: doctype,
+			name: name,
+			parent: this.$w
+		});
+	},
+	make_page: function() {
+		var page_name = wn.get_route_str();
+		this.page = wn.container.add_page(page_name);
+		wn.ui.make_app_page({parent:this.page});
+		wn.container.change_to(page_name);
+		this.$w = $(this.page).find('.layout-main-section');
+	}
+});
+
 // build a form from a set of fields
 wn.ui.Form = Class.extend({
 	init: function(opts) {
 		$.extend(this, opts);
+		this.doc = wn.model.get(this.doctype, this.name);
+		this.meta = wn.model.get('DocType', this.doctype);
+		this.controls = {};
+		this.fields = $.map(this.meta.get('DocField', {}), function(d) { return d.fields; });
+		this.make_form();
+		this.listen();
 	},
 	make_form: function() {
 		// form
 		var me = this;
-		this.$form = $('<form class="form-horizontal">').appendTo(this.$w);
+		this.$form = $('<form class="form-horizontal">').appendTo(this.parent);
 		
 		if(this.fields[0].fieldtype!='Section Break') {
 			me.make_fieldset('_first_section');
@@ -72,27 +104,6 @@ wn.ui.Form = Class.extend({
 	}
 });
 
-wn.views.FormView = wn.ui.Form.extend({
-	init: function(doctype, name) {
-		this.doctype = doctype;
-		this.name = name;
-		this.meta = wn.model.get('DocType', doctype);
-		this.doc = wn.model.get(doctype, name);
-		this.controls = {};
-		this.fields = $.map(this.meta.get('DocField', {}), function(d) { return d.fields; });
-		this.make_page();
-		this.make_form();
-		this.listen();
-	},
-	make_page: function() {
-		var page_name = wn.get_route_str();
-		this.page = wn.container.add_page(page_name);
-		wn.ui.make_app_page({parent:this.page});
-		wn.container.change_to(page_name);
-		this.$w = $(this.page).find('.layout-main-section');
-	}
-});
-
 wn.ui.make_control = function(opts) {
 	control_map = {
 		'Check': wn.ui.CheckControl,
@@ -100,7 +111,8 @@ wn.ui.make_control = function(opts) {
 		'Link': wn.ui.LinkControl,
 		'Select': wn.ui.SelectControl,
 		'Table': wn.ui.GridControl,
-		'Text': wn.ui.TextControl
+		'Text': wn.ui.TextControl,
+		'Button': wn.ui.ButtonControl
 	}
 	if(control_map[opts.docfield.fieldtype]) {
 		return new control_map[opts.docfield.fieldtype](opts);
@@ -117,13 +129,16 @@ wn.ui.Control = Class.extend({
 		this.$w.find('.control-label').text(this.docfield.label);
 		this.set_init_value();
 		if(this.no_label) {
-			this.$w.find('.control-label').toggle(false);
+			this.hide_label();
 		}
 	},
 	set_init_value: function() {
 		if(this.doctype && this.docname) {
 			this.set_input(wn.model.get_value(this.doctype, this.docname, this.docfield.fieldname));
 		}
+	},
+	hide_label: function() {
+		this.$w.find('.control-label').toggle(false);		
 	},
 	set_input: function(val) {
 		this.$input.val(val);
@@ -137,6 +152,9 @@ wn.ui.Control = Class.extend({
 	},
 	get: function() {
 		return this.$input.val();
+	},
+	get_value: function() {
+		return this.get();
 	},
 	make_input: function() {
 		this.$input = $('<input type="text">').appendTo(this.$w.find('.controls'));
@@ -176,6 +194,19 @@ wn.ui.SelectControl = wn.ui.Control.extend({
 	}
 });
 
+wn.ui.ButtonControl = wn.ui.Control.extend({
+	make_input: function() {
+		this.hide_label();
+		this.$input = $('<button class="btn btn-small">')
+			.html(this.docfield.label)
+			.appendTo(this.$w.find('.controls'));
+	},
+	get_value: function() {
+		return null;
+	}
+});
+
+
 wn.ui.LinkControl = wn.ui.Control.extend({
 	make_input: function() {
 		var me = this;
@@ -190,6 +221,7 @@ wn.ui.LinkControl = wn.ui.Control.extend({
 						me.set(val);
 					}
 				});
+				return false;
 			});
 	}
 });
@@ -233,7 +265,7 @@ wn.ui.GridControl = Class.extend({
 	},
 	set: function(val) {
 		// refresh values from doclist
-		var rows = wn.model.get(this.docfield.parenttype, this.docname)
+		var rows = wn.model.get(this.docfield.parent, this.docname)
 			.get({parentfield:this.docfield.fieldname});
 			
 		this.grid.setData($.map(rows, 

@@ -8,10 +8,13 @@ wn.views.pageview = {
 				args: {'name':name },
 				callback: callback
 			});
-		}		
+		} else {
+			callback();
+		}
 	},
 	show: function(name) {
-		if(!name) name = (wn.boot ? wn.boot.home_page : window.page_name);
+		if(!name) 
+			name = (wn.boot ? wn.boot.home_page : window.page_name);
 		wn.views.pageview.with_page(name, function(r) {
 			if(r && r.exc) {
 				if(!r['403'])wn.container.change_to('404');
@@ -35,14 +38,14 @@ wn.views.Page = Class.extend({
 			this.wrapper.page_name = window.page_name;
 			wn.pages[window.page_name] = this.wrapper;
 		} else {
-			this.pagedoc = locals.Page[this.name];
+			this.pagedoc = wn.model.get('Page', this.name);
 			this.wrapper = wn.container.add_page(this.name);
 			this.wrapper.label = this.pagedoc.get('title') || this.pagedoc.get('name');
 			this.wrapper.page_name = this.pagedoc.get('name');
 		
 			// set content, script and style
 			this.wrapper.innerHTML = this.pagedoc.get('content');
-			wn.dom.eval(this.pagedoc.get('__script', ''));
+			wn.dom.eval(this.pagedoc.get('script', ''));
 			wn.dom.set_style(this.pagedoc.get('style', ''));
 		}
 

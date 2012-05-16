@@ -54,18 +54,18 @@ wn.ui.toolbar.SelectorDialog = Class.extend({
 		var me = this;
 		
 		// on go
-		$(this.dialog.fields_dict.go.input).click(function() {
+		this.dialog.fields_dict.go.$input.click(function() {
 			if(!me.dialog.display) return;
 			me.dialog.hide();
 			me.opts.execute(me.dialog.fields_dict.doctype.get_value());
 		});
 		
 		// on change
-		$(this.dialog.fields_dict.doctype.input).change(function() {
-			me.dialog.fields_dict.go.input.click();
+		this.dialog.fields_dict.doctype.$input.change(function() {
+			me.dialog.fields_dict.go.$input.click();
 		}).keypress(function(ev) {
 			if(ev.which==13) {
-				me.dialog.fields_dict.go.input.click();				
+				me.dialog.fields_dict.go.$input.click();				
 			}
 		});
 		
@@ -73,7 +73,7 @@ wn.ui.toolbar.SelectorDialog = Class.extend({
 	},
 	show: function() {
 		this.dialog.show();
-		this.dialog.fields_dict.doctype.input.focus();
+		this.dialog.fields_dict.doctype.$input.focus();
 		return false;
 	},
 	set_values: function(lst) {
@@ -82,8 +82,7 @@ wn.ui.toolbar.SelectorDialog = Class.extend({
 			lst[i]=get_doctype_label(lst[i]);
 		
 		// set values
-		var sel = this.dialog.fields_dict.doctype.input;
-		$(sel).empty();
-		add_sel_options(sel, lst.sort());		
+		var $sel = this.dialog.fields_dict.doctype.$input;
+		$sel.empty().add_options(lst.sort());	
 	}
 })
