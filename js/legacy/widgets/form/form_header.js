@@ -46,12 +46,17 @@ _f.FrmHeader = Class.extend({
 	},
 	refresh_labels: function() {
 		var labinfo = {
-			0: ['Draft', ''],
+			0: ['Saved', 'label-success'],
 			1: ['Submitted', 'label-info'],
 			2: ['Cancelled', 'label-important']
 		}[cint(cur_frm.doc.docstatus)];
 		
-		if(cur_frm.doc.__unsaved) {
+		if(labinfo[0]=='Saved' && cur_frm.meta.is_submittable) {
+			labinfo[0]='Saved, to Submit';
+		}
+		
+		if(cur_frm.doc.__unsaved || cur_frm.doc.__islocal) {
+			labinfo[0] = 'Not Saved';
 			labinfo[1] = 'label-warning'
 		}
 

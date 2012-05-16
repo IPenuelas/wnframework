@@ -64,7 +64,7 @@ _f.Frm = function(doctype, parent) {
 	// notify on rename
 	var me = this;
 	$(document).bind('rename', function(event, dt, old_name, new_name) {
-		console.log(arguments)
+		//console.log(arguments)
 		if(dt==me.doctype)
 			me.rename_notify(dt, old_name, new_name)
 	});
@@ -131,7 +131,7 @@ _f.Frm.prototype.setup_print_layout = function() {
 	this.print_btn = $btn($td(t,0,0), 'Print', function() { cur_frm.print_doc() });
 
 	$y($td(t,0,1), {textAlign: 'right'});
-	this.print_close_btn = $btn($td(t,0,1), 'Close', function() { window.back(); });
+	this.print_close_btn = $btn($td(t,0,1), 'Close', function() { window.history.back(); });
 }
 
 
@@ -240,6 +240,9 @@ _f.Frm.prototype.email_doc = function() {
 
 _f.Frm.prototype.rename_notify = function(dt, old, name) {	
 	// from form
+	if(this.meta.in_dialog) 
+		return;
+	
 	if(this.docname == old)
 		this.docname = name;
 	else
@@ -830,7 +833,7 @@ _f.Frm.prototype.save = function(save_action, call_back) {
 		}
 		
 		if(!me.meta.istable) {
-			me.refresh();
+			me.refresh(r.docname);
 		}
 
 		if(call_back){
@@ -862,7 +865,8 @@ _f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 		// make doc list
 		var doclist = compress_doclist(make_doclist(this.doctype, this.docname));
 		// send to run
-		if(callingfield)callingfield.input.disabled = true;
+		if(callingfield)
+			$(callingfield.input).set_working();
 
 		$c('runserverobj', {'docs':doclist, 'method':scriptname }, 
 			function(r, rtxt) { 
@@ -877,7 +881,8 @@ _f.Frm.prototype.runscript = function(scriptname, callingfield, onrefresh) {
 				me.refresh_dependency();
 
 				// enable button
-				if(callingfield)callingfield.input.done_working();
+				if(callingfield)
+					$(callingfield.input).done_working();
 			}
 		);
 	}

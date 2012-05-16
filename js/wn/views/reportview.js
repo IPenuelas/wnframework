@@ -20,6 +20,7 @@
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+
 // Routing Rules
 // --------------
 // `Report` shows list of all pages from which you can start a report + all saved reports
@@ -31,37 +32,32 @@ wn.views.reportview = {
 	show: function(dt) {
 		var route = wn.get_route();
 		if(route[1]) {
-			new wn.views.ReportView(route[1], route[2]);				
+			new wn.views.ReportViewPage(route[1], route[2]);				
 		} else {
 			wn.set_route('404');
 		}
 	}
 }
 
-wn.views.ReportView = wn.ui.Listing.extend({
+wn.views.ReportViewPage = Class.extend({
 	init: function(doctype, docname) {
-		var me = this;
-		this.import_slickgrid();
 		this.doctype = doctype;
 		this.docname = docname;
-		this.tab_name = '`tab'+doctype+'`';
-		
-		// list of [column_name, table_name]
+		this.page_name = wn.get_route_str();
 		this.make_page();
+
+		var me = this;
 		wn.model.with_doctype(doctype, function() {
-			me.setup();
+			me.make_report_view();
 			if(docname) {
 				wn.model.with_doc('Report', docname, function(r) {
-					me.set_columns_and_filters(JSON.parse(wn.model.get('Report', docname).get('json')));
-					me.run();
+					me.reportview.set_columns_and_filters(JSON.parse(locals['Report'][docname].json));
+					me.reportview.run();
 				});
 			} else {
-				me.run();
+				me.reportview.run();
 			}
 		});
-	},
-	import_slickgrid: function() {
-		wn.lib.import_slickgrid();
 	},
 	make_page: function() {
 		var page_name = wn.get_route_str();
@@ -70,6 +66,26 @@ wn.views.ReportView = wn.ui.Listing.extend({
 			single_column:true});
 		wn.container.change_to(page_name);
 	},
+	make_report_view: function() {
+		// add breadcrumbs
+		wn.views.breadcrumbs($('<span>').appendTo(this.page.appframe.$titlebar), 
+			locals.DocType[this.doctype].module);
+			
+		this.reportview = new wn.views.ReportView(this.doctype, this.docname, this.page)
+	}
+})
+
+wn.views.ReportView = wn.ui.Listing.extend({
+	init: function(doctype, docname, page) {
+		var me = this;
+		wn.lib.import_slickgrid();
+		this.doctype = doctype;
+		this.docname = docname;
+		this.page = page;
+		this.tab_name = '`tab'+doctype+'`';
+		this.setup();
+	},
+
 	set_init_columns: function() {
 		// pre-select mandatory columns
 		var columns = [['name'], ['owner']];
@@ -82,8 +98,6 @@ wn.views.ReportView = wn.ui.Listing.extend({
 	},
 	setup: function() {
 		var me = this;
-		wn.views.breadcrumbs($('<span>').appendTo(this.page.appframe.$titlebar), 
-			wn.model.get('DocType', this.doctype).get('module'));
 		this.make({
 			title: 'Report: ' + (this.docname ? (this.doctype + ' - ' + this.docname) : this.doctype),
 			appframe: this.page.appframe,
@@ -156,23 +170,48 @@ wn.views.ReportView = wn.ui.Listing.extend({
 	build_columns: function() {
 		var me = this;
 		return $.map(this.columns, function(c) {
-			return {
+			var docfield = wn.meta.docfield_map[c[1] || me.doctype][c[0]];
+			coldef = {
 				id: c[0],
 				field: c[0],
-				name: (wn.meta.docfield_map[c[1] || me.doctype][c[0]] ? 
-					wn.meta.docfield_map[c[1] || me.doctype][c[0]].label : toTitle(c[0])),
-				width: 120
+				docfield: docfield,
+				name: (docfield ? docfield.label : toTitle(c[0])),
+				width: (docfield ? cint(docfield.width) : 120) || 120
 			}
+						
+			if(c[0]=='name') {
+				coldef.formatter = function(row, cell, value, columnDef, dataContext) {
+					return repl("<a href='#!Form/%(doctype)s/%(name)s'>%(name)s</a>", {
+						doctype: me.doctype,
+						name: value
+					});
+				}
+			} else if(docfield && docfield.fieldtype=='Link') {
+				coldef.formatter = function(row, cell, value, columnDef, dataContext) {
+					if(value) {
+						return repl("<a href='#!Form/%(doctype)s/%(name)s'>%(name)s</a>", {
+							doctype: columnDef.docfield.options,
+							name: value
+						});						
+					} else {
+						return '';
+					}
+				}				
+			}
+			
+			return coldef;
 		});
 	},
 	
 	// render data
 	render_list: function() {
+		var me = this;
 		//this.gridid = wn.dom.set_unique_id()
 		var columns = [{id:'_idx', field:'_idx', name: 'Sr.', width: 40}].concat(this.build_columns());
 
 		// add sr in data
 		$.each(this.data, function(i, v) {
+			// add index
 			v._idx = i+1;
 		});
 
@@ -305,7 +344,7 @@ wn.ui.ColumnPicker = Class.extend({
 		this.selects = {};
 	},
 	show: function(columns) {
-		wn.require('lib/js/lib/jquery/jquery.ui.sortable.js');
+		wn.require('js/lib/jquery/jquery.ui.sortable.js');
 		var me = this;
 		if(!this.dialog) {
 			this.dialog = new wn.ui.Dialog({

@@ -95,7 +95,7 @@ def msgprint(msg, small=0, raise_exception=0, as_table=False):
 	
 	message_log.append((small and '__small:' or '')+cstr(msg or ''))
 	if raise_exception:
-		raise ValidationError
+		raise ValidationError, msg
 
 def is_apache_user():
 	import os
@@ -149,7 +149,7 @@ def remove_file(path):
 		if e.args[0]!=2: 
 			raise e
 			
-def connect(db_name=None):
+def connect(db_name=None, password=None):
 	"""
 		Connect to this db (or db), if called from command prompt
 	"""
@@ -158,7 +158,7 @@ def connect(db_name=None):
 
 	import webnotes.db
 	global conn
-	conn = webnotes.db.Database(user=db_name)
+	conn = webnotes.db.Database(user=db_name, password=password)
 	
 	global session
 	session = {'user':'Administrator'}
@@ -190,12 +190,14 @@ def get_db_password(db_name):
 
 whitelisted = []
 guest_methods = []
-def whitelist(allow_guest=False):
+def whitelist(allow_guest=False, allow_roles=[]):
 	"""
 	decorator for whitelisting a function
 	
 	Note: if the function is allowed to be accessed by a guest user,
 	it must explicitly be marked as allow_guest=True
+	
+	for specific roles, set allow_roles = ['Administrator'] etc.
 	"""
 	def innerfn(fn):
 		global whitelisted, guest_methods
@@ -203,6 +205,17 @@ def whitelist(allow_guest=False):
 
 		if allow_guest:
 			guest_methods.append(fn)
+
+		if allow_roles:
+			roles = get_roles()
+			allowed = False
+			for role in allow_roles:
+				if role in roles:
+					allowed = True
+					break
+			
+			if not allowed:
+				raise PermissionError, "Method not allowed"
 
 		return fn
 
@@ -213,12 +226,13 @@ def clear_cache(user=None):
 	from webnotes.session_cache import clear
 	clear(user)
 	
-def get_roles():
+def get_roles(user=None):
 	"""get roles of current user"""
-	if session['user']=='Guest':
+	if not user:
+		user = session['user']
+
+	if user=='Guest':
 		return ['Guest']
 		
-	roles = [r[0] for r in conn.sql("""select distinct role from tabUserRole 
-		where parent=%s and role!='All'""", session['user'])]
-
-	return roles + ['All']
+	return [r[0] for r in conn.sql("""select distinct role from tabUserRole 
+		where parent=%s and role!='All'""", user)] + ['All']

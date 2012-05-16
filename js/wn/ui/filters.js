@@ -37,7 +37,7 @@ wn.ui.FilterList = Class.extend({
 	},
 	
 	show_filters: function() {
-		this.$w.find('.show_filters').slideToggle();
+		this.$w.find('.show_filters').toggle();
 		if(!this.filters.length)
 			this.add_filter();
 	},

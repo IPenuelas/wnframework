@@ -57,17 +57,26 @@ def get_link_fields(doctype):
 	"""
 		Returns list of link fields for a doctype in tuple (fieldname, options, label)
 	"""
-	return webnotes.conn.sql("""
-		SELECT fieldname, options, label 
-		FROM tabDocField 
-		WHERE parent='%s' 
-		and (fieldtype='Link' or (fieldtype='Select' and `options` like 'link:%%')) 
-		and fieldname!='owner'""" % (doctype))
+	import webnotes.model.doctype
+	doclist = webnotes.model.doctype.get(doctype)
+	return [
+		(d.fields.get('fieldname'), d.fields.get('options'), d.fields.get('label'))
+		for d in doclist
+		if d.fields.get('doctype') == 'DocField' and d.fields.get('parent') == doctype
+		and d.fields.get('fieldname')!='owner'
+		and (d.fields.get('fieldtype') == 'Link' or
+			(	d.fields.get('fieldtype') == 'Select'
+				and (d.fields.get('options') or '').startswith('link:'))
+			)
+	]
 
 #=================================================================================
 
 def get_table_fields(doctype):
-	return webnotes.conn.sql("select options, fieldname from tabDocField \
-		where parent='%s' and fieldtype='Table'" % doctype, as_list=1)
-
+	child_tables = [[d[0], d[1]] for d in webnotes.conn.sql("select options, fieldname from tabDocField \
+		where parent='%s' and fieldtype='Table'" % doctype, as_list=1)]
 	
+	custom_child_tables = [[d[0], d[1]] for d in webnotes.conn.sql("select options, fieldname from `tabCustom Field` \
+		where dt='%s' and fieldtype='Table'" % doctype, as_list=1)]
+
+	return child_tables + custom_child_tables

@@ -16,10 +16,7 @@
 			"lib/js/wn/ui/listing.js",
 			"lib/js/wn/ui/filters.js",
 			"lib/js/wn/views/container.js",
-			"lib/js/wn/views/doclistview.js",
 			"lib/js/wn/views/pageview.js",
-			"lib/js/wn/views/formview.js",
-			"lib/js/wn/views/reportview.js",
 			"lib/js/wn/request.js",
 			"lib/js/core.js"
 		]
@@ -37,7 +34,7 @@
 	},
 
 	{
-		"css/all-web.css": [
+		"public/css/all-web.css": [
 			"lib/css/bootstrap/headings.css",
 			"lib/css/bootstrap/buttons.css",
 			"lib/css/bootstrap/navbar.css",
@@ -55,7 +52,7 @@
 	},
 	
 	{
-		"css/all-app.css": [
+		"public/css/all-app.css": [
 			"lib/css/bootstrap/headings.css",
 			"lib/css/bootstrap/buttons.css",
 			"lib/css/bootstrap/navbar.css",
@@ -70,17 +67,16 @@
 			"lib/css/legacy/report.css",
 			"lib/css/legacy/dialog.css",
 			"lib/css/legacy/sidebar.css",
-			"lib/css/Aristo/aristo.selected.css",
 			"lib/css/ui/common.css",
 			"lib/css/ui/list.css",
 			"lib/css/ui/views.css",
 			"lib/css/ui/fonts.css",
+			"lib/js/lib/Aristo/aristo.selected.css",
 		]
 	},
 
 	{
-		"js/all-web.js": [
-			"lib/js/lib/history/history.min.js:concat",
+		"public/js/all-web.js": [
 			"lib/js/lib/bootstrap.min.js:concat",
 			"lib/js/core.min.js:concat",
 			"lib/js/legacy/globals.js",
@@ -98,14 +94,12 @@
 			"lib/js/legacy/wn/widgets/footer.js",
 			"lib/js/legacy/model/local_data.js",
 			"lib/js/legacy/model/doclist.js",
-			"lib/js/wn/app.js",
-			"js/app.js"
+			"lib/js/wn/app.js"
 		]
 	},
 	
 	{
-		"js/all-app.js": [
-			"lib/js/lib/history/history.min.js:concat",
+		"public/js/all-app.js": [
 			"lib/js/lib/jquery/jquery.ui.core.js:concat",
 			"lib/js/lib/jquery/jquery.ui.datepicker.js:concat",
 			"lib/js/lib/jquery/jquery.ui.autocomplete.js:concat",
@@ -123,6 +117,13 @@
 			"lib/js/wn/ui/dialog.js",
 			"lib/js/wn/ui/search.js",
 			"lib/js/wn/ui/button.js",
+			"lib/js/wn/ui/search.js",
+			"lib/js/wn/ui/tree.js",
+			"lib/js/wn/upload.js",
+			"lib/js/wn/misc/about.js",
+			"lib/js/wn/views/doclistview.js",
+			"lib/js/wn/views/formview.js",
+			"lib/js/wn/views/reportview.js",
 			"lib/js/legacy/widgets/dialog.js",
 			"lib/js/legacy/widgets/layout.js",
 			"lib/js/legacy/widgets/tags.js",
@@ -130,15 +131,13 @@
 			"lib/js/legacy/webpage/spinner.js",
 			"lib/js/legacy/webpage/error_console.js",
 			"lib/js/legacy/webpage/loaders.js",
-			"lib/js/legacy/webpage/uploader.js",
 			"lib/js/legacy/wn/page_layout.js",
 			"lib/js/legacy/wn/widgets/footer.js",
 			"lib/js/legacy/model/local_data.js",
 			"lib/js/legacy/model/doclist.js",
 			"lib/js/wn/ui/toolbar.min.js:concat",
 			"lib/js/wn/views/breadcrumbs.js",
-			"lib/js/wn/app.js",
-			"js/app.js"
+			"lib/js/wn/app.js"
 		]
 	}
 ]

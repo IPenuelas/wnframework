@@ -22,6 +22,28 @@
 
 wn.Application = Class.extend({
 	init: function() {
+		var me = this;
+		if(window.app) {
+			wn.call({
+				method: 'startup',
+				callback: function(r, rt) {
+					wn.provide('wn.boot');
+					wn.boot = r;
+					if(wn.boot.profile.name=='Guest') {
+						window.location = 'index.html';
+						return;
+					}
+					me.startup();
+				}
+			})
+		} else {
+			// clear sid cookie
+			//document.cookie = "sid=Guest;expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"
+			this.startup();
+			//wn.views.pageview.show(window.home_page);
+		}
+	},
+	startup: function() {
 		// load boot info
 		this.load_bootinfo();
 
@@ -33,23 +55,31 @@ wn.Application = Class.extend({
 			
 		// favicon
 		this.set_favicon();
-		
+
 		// trigger app startup
 		$(document).trigger('startup');
 		
-		// route to home page
-		wn.route();
+		if(wn.boot) {
+			// route to home page
+			wn.route();	
+		}
+		
+		$(document).trigger('app_ready');
 	},
 	load_bootinfo: function() {
-		wn.model.sync(expand_doclist(wn.boot.docs));
-		wn.control_panel = wn.boot.control_panel;
-		
-		if(wn.boot.error_messages)
-			console.log(wn.boot.error_messages)
-		if(wn.boot.server_messages) 
-			msgprint(wn.boot.server_messages);
-		
-		this.set_globals();		
+		if(wn.boot) {
+			wn.model.sync(expand_doclist(wn.boot.docs));
+			wn.control_panel = wn.boot.control_panel;
+
+			if(wn.boot.error_messages)
+				console.log(wn.boot.error_messages)
+			if(wn.boot.server_messages) 
+				msgprint(wn.boot.server_messages);
+
+			this.set_globals();				
+		} else {
+			this.set_as_guest();
+		}
 	},
 	set_globals: function() {
 		// for backward compatibility
@@ -61,34 +91,42 @@ wn.Application = Class.extend({
 		user_email = profile.email;
 		sys_defaults = wn.boot.sysdefaults;		
 	},
+	set_as_guest: function() {
+		// for backward compatibility
+		profile = {name:'Guest'};
+		user = 'Guest';
+		user_fullname = 'Guest';
+		user_defaults = {};
+		user_roles = ['Guest'];
+		user_email = '';
+		sys_defaults = {};
+	},
 	make_page_container: function() {
 		wn.container = new wn.views.Container();
 		wn.views.make_403();
 		wn.views.make_404();
-		$('#startup_div').toggle(false);
-		$('#body_div').toggle(true);
 	},
 	make_nav_bar: function() {
 		// toolbar
-		if(wn.user.name !='Guest') {
+		if(wn.boot) {
 			wn.container.wntoolbar = new wn.ui.toolbar.Toolbar();
 		}
 	},
 	logout: function() {
 		var me = this;
+		me.logged_out = true;
 		wn.call({
 			method:'logout',
 			callback: function(r) {
 				if(r.exc) {
-					console.log(r.exc); return;
+					console.log(r.exc);
 				}
 				me.redirect_to_login();
 			}
 		})
 	},
 	redirect_to_login: function() {
-		window.location.hash = '';
-		window.location.reload();		
+		window.location.href = 'index.html';
 	},
 	set_favicon: function() {
 		var link = $('link[type="image/x-icon"]').remove().attr("href");

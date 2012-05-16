@@ -23,12 +23,13 @@
 # Please edit this list and import only required elements
 import webnotes
 
-from webnotes.utils import add_days, add_months, add_years, cint, cstr, date_diff, default_fields, flt, fmt_money, formatdate, generate_hash, getTraceback, get_defaults, get_first_day, get_last_day, getdate, has_common, month_name, now, nowdate, replace_newlines, sendmail, set_default, str_esc_quote, user_format, validate_email_add
+from webnotes.utils import cint, cstr, default_fields, flt, formatdate, get_defaults, getdate, now, nowdate, replace_newlines, set_default
 from webnotes.model import db_exists, default_fields
-from webnotes.model.doc import Document, addchild, removechild, getchildren, make_autoname, SuperDocType
-from webnotes.model.doclist import getlist, copy_doclist
-from webnotes.model.code import get_obj, get_server_obj, run_server_obj, updatedb, check_syntax
-from webnotes import session, form, is_testing, msgprint, errprint
+from webnotes.model.doc import Document, addchild, getchildren, make_autoname
+from webnotes.model.doclist import getlist
+from webnotes.model.code import get_obj
+from webnotes import session, form, msgprint, errprint
+from webnotes.model.doctype import get
 
 set = webnotes.conn.set
 sql = webnotes.conn.sql
@@ -45,7 +46,6 @@ class DocType:
 		self.doclist = doclist
 		self.ref_doc = ''
 		
-	# Autoname
 	#---------------------------------------------------------------------------
 	def autoname(self):
 		self.doc.name = make_autoname(self.doc.from_doctype + '-' + self.doc.to_doctype)
@@ -73,7 +73,8 @@ class DocType:
 		if not doclist:
 			doclist.append(to_doc)
 
-		tbl_list = sql("select from_table, to_table, from_field, to_field, match_id, validation_logic from `tabTable Mapper Detail` where parent ='%s' order by match_id" % self.doc.name, as_dict=1)
+		tbl_list = sql("select from_table, to_table, from_field, to_field, match_id, validation_logic \
+			from `tabTable Mapper Detail` where parent ='%s' order by match_id" % self.doc.name, as_dict=1)
 
 		for t in tbl_list:
 			if [t['from_table'], t['to_table']] in eval(from_to_list):
@@ -117,7 +118,8 @@ class DocType:
 			if not docnames:
 				msgprint("Validation failed in doctype mapper. Please contact Administrator.", raise_exception=1)
 		else:
-			docnames = sql("select name from `tab%s` where parent='%s' and parenttype = '%s' and %s order by idx" % (t['from_table'], from_dn, self.doc.from_doctype, t['validation_logic']))
+			docnames = sql("select name from `tab%s` where parent='%s' and parenttype = '%s' and %s order by idx" \
+				% (t['from_table'], from_dn, self.doc.from_doctype, t['validation_logic']))
 		
 		return docnames
 	
@@ -140,20 +142,18 @@ class DocType:
 		exception_flds = copy.copy(default_fields)
 		exception_flds += [f[1] for f in flds]
 		
-		similar_flds = [
-			[d[0], d[0], 'Yes'] for d in sql("""
-				select t1.fieldname 
-				from `tabDocField` t1, `tabDocField` t2 
-				where t1.parent = %s and t2.parent = %s 
-				and t1.fieldname = t2.fieldname 
-				and t1.docstatus != 2 and t2.docstatus != 2 
-				and ifnull(t1.no_copy, 0) = 0
-				and ifnull(t1.fieldname, '') != ''
-				and t1.fieldtype not in ('Table', 'Section Break', 'Column Break', 'HTML')
-			""",(t['from_table'], t['to_table'])) if d[0] not in exception_flds
-		]
+		from_flds = [d.fieldname for d in get(t['from_table']) \
+			if cint(d.no_copy) == 0 and d.docstatus != 2 and d.fieldname \
+			and d.fieldtype not in ('Table', 'Section Break', 'Column Break', 'HTML')]
 
-		return similar_flds		
+		to_flds = [d.fieldname for d in get(t['to_table']) \
+			if cint(d.no_copy) == 0 and d.docstatus != 2 and d.fieldname \
+			and d.fieldtype not in ('Table', 'Section Break', 'Column Break', 'HTML')]
+
+		similar_flds = [[d, d, 'Yes'] for d in from_flds \
+			if d in to_flds and d not in exception_flds]
+
+		return similar_flds
 		
 	#---------------------------------------------------------------------------
 	def set_value(self, fld_list, obj, to_doc):
@@ -194,28 +194,26 @@ class DocType:
 		self.check_fields_in_dt()
 		
 		
-	#---------------------------------------------------------------------------
 	def check_fields_in_dt(self):
 		"""
 			Check if any wrong fieldname entered in mapper
 		"""
+		flds = {}
+		for t in getlist(self.doclist, 'table_mapper_details'):
+			from_flds = [cstr(d.fieldname) for d in get(t.from_table)]
+			to_flds = [cstr(d.fieldname) for d in get(t.to_table)]
+			flds[cstr(t.match_id)] = [cstr(t.from_table), from_flds, cstr(t.to_table), to_flds]
+
 		for d in getlist(self.doclist, 'field_mapper_details'):
-			table_name = sql("select from_table, to_table from `tabTable Mapper Detail` where parent ='%s' and match_id = '%s'" % (self.doc.name, d.match_id))
-			
-			if table_name:
-				exists1 = sql("select name from tabDocField where parent = '%s' and fieldname = '%s'" % (table_name[0][0], d.from_field))
-				exists2 = sql("select name from tabDocField where parent = '%s' and fieldname = '%s'" % (table_name[0][1], d.to_field))
-				
-				# Default fields like name, parent, owner does not exists in DocField
-				if not exists1 and d.from_field not in default_fields:
-					msgprint('"' + cstr(d.from_field) + '" does not exists in DocType "' + cstr(table_name[0][0]) + '"')
-				if not exists2 and d.to_field not in default_fields:
-					msgprint('"' + cstr(d.to_field) + '" does not exists in DocType "' + cstr(table_name[0][1]) + '"')
+			# Default fields like name, parent, owner does not exists in DocField
+			if d.from_field not in flds[cstr(d.match_id)][1] and d.from_field not in default_fields:
+				msgprint("'%s' does not exists in DocType: '%s'" % (cstr(d.from_field), cstr(flds[cstr(d.match_id)][0])))
+			if d.to_field not in flds[cstr(d.match_id)][3] and d.to_field not in default_fields:
+				msgprint("'%s' does not exists in DocType: '%s'" % (cstr(d.to_field), cstr(flds[cstr(d.match_id)][2])))
 					
 					
-	# Check consistency of value with reference document
-	#---------------------------------------------------
 	def validate_reference_value(self, obj, to_docname):
+		""" Check consistency of value with reference document"""
 		for t in getlist(self.doclist, 'table_mapper_details'):
 			# Reference key is the fieldname which will relate to the from_table
 			if t.reference_doctype_key:
@@ -223,71 +221,76 @@ class DocType:
 					if d.fields[t.reference_doctype_key] == self.doc.from_doctype:
 						self.check_consistency(obj.doc, d, to_docname)
 						self.check_ref_docstatus()
+
 				
-	# Make list of fields whose value will be consistent with prevdoc
-	#-----------------------------------------------------------------
 	def get_checklist(self):
+		""" Make list of fields whose value will be consistent with prevdoc """
 		checklist = []
 		for f in getlist(self.doclist, 'field_mapper_details'):
-		
 			# Check which field's value will be compared
 			if f.checking_operator:
-				checklist.append([f.from_field, f.to_field, f.checking_operator, f.match_id])
+				checklist.append({'from_fld': f.from_field, 'to_fld': f.to_field, 'op': f.checking_operator, 'match_id': f.match_id})
 		return checklist
 				
-	def check_fld_type(self, tbl, fld, cur_val):
-		ft = sql("select fieldtype from tabDocField where fieldname = '%s' and parent = '%s'" % (fld,tbl))
-		ft	= ft and ft[0][0] or ''
-		if ft == 'Currency' or ft == 'Float':
-			cur_val = '%.2f' % flt(cur_val)
-		return cur_val, ft
-				
-	# Check consistency
-	#-------------------
+	def get_label_and_type(self, from_dt, to_dt):
+		"""get label, fieldtype"""
+		from_flds, to_flds = {}, {}
+		for d in get(from_dt):
+			from_flds[d.fieldname] = {'label': d.label, 'fieldtype': d.fieldtype}
+
+		for d in get(to_dt):
+			to_flds[d.fieldname] = {'label': d.label, 'fieldtype': d.fieldtype}
+
+		return from_flds, to_flds
+
+
 	def check_consistency(self, par_obj, child_obj, to_docname):
+		"""Check whether values between from_dt and to_dt are consistent"""
 		checklist = self.get_checklist()
 		self.ref_doc = ''
 		for t in getlist(self.doclist, 'table_mapper_details'):
 			if t.reference_key and child_obj.fields[t.reference_key]:
+				from_flds, to_flds = self.get_label_and_type(t.from_table, t.to_table)
 				for cl in checklist:
-					if cl[3] == t.match_id:
+					if cl['match_id'] == t.match_id:
 						if t.to_field:
-							cur_val = child_obj.fields[cl[1]]
+							cur_val = child_obj.fields[cl['to_fld']]
 						else:
-							cur_val = par_obj.fields[cl[1]]
+							cur_val = par_obj.fields[cl['to_fld']]
 						
-						ft = self.check_fld_type(t.to_table, cl[1], cur_val)
-						cur_val = ft[0]
+						if to_flds[cl['to_fld']]['fieldtype'] in ['Currency', 'Float']:
+							cur_val = '%.2f' % flt(cur_val)
 
-						if cl[2] == '=' and (ft[1] == 'Currency' or ft[1] == 'Float'):
-							consistent = sql("select name, %s from `tab%s` where name = '%s' and '%s' - %s <= 0.5" % (cl[0], t.from_table, child_obj.fields[t.reference_key], flt(cur_val), cl[0]))
+						if cl['op'] == '=' and to_flds[cl['to_fld']]['fieldtype'] in ['Currency', 'Float']:
+							consistent = sql("select name, %s from `tab%s` where name = '%s' and '%s' - %s <= 0.5" \
+								% (cl['from_fld'], t.from_table, child_obj.fields[t.reference_key], flt(cur_val), cl['from_fld']))
 						else:
-							consistent = sql("select name, %s from `tab%s` where name = '%s' and '%s' %s ifnull(%s, '')" % (cl[0], t.from_table, child_obj.fields[t.reference_key], ft[1] in ('Currency', 'Float', 'Int') and flt(cur_val) or cstr(cur_val), cl[2],	cl[0]))
+							consistent = sql("select name, %s from `tab%s` where name = '%s' and '%s' %s ifnull(%s, '')" \
+								% (cl['from_fld'], t.from_table, child_obj.fields[t.reference_key], \
+								to_flds[cl['to_fld']]['fieldtype'] in ('Currency', 'Float', 'Int') and flt(cur_val) or cstr(cur_val), cl['op'],	cl['from_fld']))
 
 						if not self.ref_doc:
 							det = sql("select name, parent from `tab%s` where name = '%s'" % (t.from_table, child_obj.fields[t.reference_key]))
-							self.ref_doc = det[0][1] and det[0][1] or det[0][0]			 
+							self.ref_doc = det[0][1] and det[0][1] or det[0][0]
 
 						if not consistent:
-							self.give_message(t.from_table, t.to_table, cl[0], cl[1], child_obj.fields[t.reference_key], cl[2])
+							self.give_message(from_flds[cl['from_fld']]['label'], to_flds[cl['to_fld']]['label'], cl['op'])
+
 							
-	# Gives message and raise exception
-	#-----------------------------------
-	def give_message(self, from_table, to_table, from_field, to_field, ref_value, operator):
-		# Select label of the field
-		to_fld_label = sql("select label from tabDocField where parent = '%s' and fieldname = '%s'" % (to_table, to_field))
-		from_fld_label = sql("select label from tabDocField where parent = '%s' and fieldname = '%s'" % (from_table, from_field))
-		
+	def give_message(self, from_label, to_label, operator):
+		""" Gives message and raise exception"""
 		op_in_words = {'=':'equal to ', '>=':'greater than equal to ', '>':'greater than ', '<=':'less than equal to ', '<':'less than '}
-		msgprint(to_fld_label[0][0] + " should be " + op_in_words[operator] + from_fld_label[0][0] + " of " +	self.doc.from_doctype + ": " + self.ref_doc, raise_exception=1)
+		msgprint("%s should be %s %s of %s: %s" % (to_label, op_in_words[operator], from_label, self.doc.from_doctype, self.ref_doc), raise_exception=1)
 		
+
 	def check_ref_docstatus(self):
 		if self.ref_doc:
 			det = sql("select name, docstatus from `tab%s` where name = '%s'" % (self.doc.from_doctype, self.ref_doc))
 			if not det:
-				msgprint(self.doc.from_doctype + ": " + self.ref_doc + " does not exists in the system", raise_exception=1)
+				msgprint("%s: %s does not exists in the system" % (self.doc.from_doctype, self.ref_doc), raise_exception=1)
 			elif self.doc.ref_doc_submitted and det[0][1] != 1:
-				msgprint(self.doc.from_doctype + ": " + self.ref_doc + " is not Submitted Document.", raise_exception=1)
+				msgprint("%s: %s is not submitted document." % (self.doc.from_doctype, self.ref_doc), raise_exception=1)
+
 
 	def on_update(self):
 		"""

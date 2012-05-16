@@ -60,12 +60,12 @@ Field.prototype.make_body = function() {
 	
 		// error icon
 		this.label_icon = $a(this.label_area,'img','',{margin:'-3px 4px -3px 4px'}); $dh(this.label_icon);
-		this.label_icon.src = 'lib/images/icons/error.gif';
+		this.label_icon.src = 'images/lib/icons/error.gif';
 		this.label_icon.title = 'Mandatory value needs to be entered';
 
 		// error icon
 		this.suggest_icon = $a(this.label_area,'img','',{margin:'-3px 4px -3px 0px'}); $dh(this.suggest_icon);
-		this.suggest_icon.src = 'lib/images/icons/bullet_arrow_down.png';
+		this.suggest_icon.src = 'images/lib/icons/bullet_arrow_down.png';
 		this.suggest_icon.title = 'With suggestions';
 
 	} else {
@@ -404,7 +404,7 @@ DataField.prototype.make_input = function() {
 	this.input.name = this.df.fieldname;
 	
 	$(this.input).change(function() {
-		me.set_value($(this).val());
+		me.set_value(me.get_value && me.get_value() || $(this.input).val());
 	});
 	
 	this.set_value = function(val) {
@@ -412,9 +412,9 @@ DataField.prototype.make_input = function() {
 
 		if(me.validate) {
 			val = me.validate(val);
-			me.input.value = val;
+			me.input.value = val==undefined ? '' : val;
 		}
-			
+
 		me.set(val);
 		if(me.format_input)
 			me.format_input();
@@ -454,6 +454,9 @@ DataField.prototype.make_input = function() {
 						response(r.results);
 					}
 				});
+			},
+			select: function(event, ui) {
+				me.set(ui.item.value);
 			}
 		});
 	}
@@ -627,7 +630,7 @@ LinkField.prototype.make_input = function() {
 			});
 		},
 		select: function(event, ui) {
-			me.set_input_value(ui.item.value);			
+			me.set_input_value(ui.item.value);
 		}
 	}).data('autocomplete')._renderItem = function(ul, item) {
 		return $('<li></li>')
@@ -637,8 +640,11 @@ LinkField.prototype.make_input = function() {
 	};
 	
 	$(this.txt).change(function() {
-		if(!$(this).val())
-			me.set_input_value('');
+		if(!$(this).val()) {
+			if(selector && selector.display) 
+				return;
+			me.set_input_value('');			
+		}
 	})
 }
 
@@ -691,8 +697,9 @@ LinkField.prototype.setup_buttons = function() {
 }
 
 LinkField.prototype.set_input_value = function(val) {
-	
 	var me = this;
+	var from_selector = false;
+	if(selector && selector.display) from_selector = true;
 		
 	// refresh mandatory style
 	me.refresh_label_icon();
@@ -706,7 +713,7 @@ LinkField.prototype.set_input_value = function(val) {
 	// same value, do nothing
 	if(cur_frm) {
 		if(val == locals[me.doctype][me.docname][me.df.fieldname]) { 
-			me.set(val); // one more time, grid bug?
+			//me.set(val); // one more time, grid bug?
 			me.run_trigger(); // wanted - called as refresh?
 			return; 
 		}
@@ -720,7 +727,7 @@ LinkField.prototype.set_input_value = function(val) {
 		_f.cur_grid_cell.grid.cell_deselect();
 	
 	// run trigger if value is cleared
-	if(!val) {
+	if(locals[me.doctype][me.docname][me.df.fieldname] && !val) {
 		me.run_trigger();
 		return;
 	}
@@ -736,17 +743,17 @@ LinkField.prototype.set_input_value = function(val) {
 			'fetch': fetch
 		}, 
 		function(r,rt) { 
-			if(selector && selector.display) return; // selecting from popup
-		
 			if(r.message=='Ok') {
 				// set fetch values
 				if($(me.txt).val()!=val) {
-					me.set_input(val);
+					if((me.grid && !from_selector) || (!me.grid)) {
+						$(me.txt).val(val);
+					}
 				}
 				
 				if(r.fetch_values) 
 					me.set_fetch_values(r.fetch_values);
-			
+
 				me.run_trigger();
 			} else {
 				var astr = '';
@@ -860,7 +867,7 @@ CheckField.prototype.validate = function(v) {
 CheckField.prototype.onmake = function() {
 	this.checkimg = $a(this.disp_area, 'div');
 	var img = $a(this.checkimg, 'img');
-	img.src = 'lib/images/ui/tick.gif';
+	img.src = 'images/lib/ui/tick.gif';
 	$dh(this.checkimg);
 }
 
@@ -1004,7 +1011,7 @@ SelectField.prototype.make_input = function() {
 		if(this.file_attach)
 			this.set_attach_options();
 		
-		me.options_list = me.df.options?me.df.options.split('\n'):[];
+		me.options_list = me.df.options?me.df.options.split('\n'):[''];
 		
 		// add options
 		empty_select(this.input);
@@ -1269,18 +1276,15 @@ _f.ButtonField.prototype.make_input = function() { var me = this;
 		me.df.label, null, 
 		{fontWeight:'bold'}, null, 1)
 
-	this.input.onclick = function() {
+	$(this.input).click(function() {
 		if(me.not_in_form) return;
-		this.disabled = 'disabled';
 		
 		if(cur_frm.cscript[me.df.fieldname] && (!me.in_filter)) {
 			cur_frm.runclientscript(me.df.fieldname, me.doctype, me.docname);
-			this.disabled = false;
 		} else {
 			cur_frm.runscript(me.df.options, me);
-			this.disabled = false;
 		}
-	}
+	});
 }
 
 _f.ButtonField.prototype.hide = function() { 

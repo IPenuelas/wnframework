@@ -50,12 +50,12 @@ def check_if_doc_is_linked(dt, dn):
 		else:
 			item = None
 			try:
-				item = sql("select name from `tab%s` where `%s`='%s' and docstatus!=2 limit 1" % (link_dt, link_field, dn))
+				item = sql("select name, parent, parenttype from `tab%s` where `%s`='%s' and docstatus!=2 limit 1" % (link_dt, link_field, dn))
 			except Exception, e:
 				if e.args[0]==1146: pass
 				else: raise e
 			if item:
-				webnotes.msgprint("Cannot delete %s <b>%s</b> because it is linked in %s <b>%s</b>" % (dt, dn, link_dt, item[0][0]), raise_exception=1)
+				webnotes.msgprint("Cannot delete %s <b>%s</b> because it is linked in %s <b>%s</b>" % (dt, dn, item[0][2] or link_dt, item[0][1] or item[0][0]), raise_exception=1)
 
 @webnotes.whitelist()
 def delete_doc(doctype=None, name=None, doclist = None, force=0):
@@ -146,7 +146,7 @@ def get_link_fields(dt):
 			((options = '%s' and fieldtype='Link') or \
 			(options = 'link:%s' and fieldtype='Select'))" % (dt, dt))
 
-def rename(dt, old, new, is_doctype = 0):
+def rename(dt, old, new, is_doctype=0):
 	"""
 		Renames a doc(dt, old) to doc(dt, new) and updates all linked fields of type "Link" or "Select" with "link:"
 	"""
@@ -167,15 +167,15 @@ def rename(dt, old, new, is_doctype = 0):
 	# get links (link / select)
 	ll = get_link_fields(dt)
 	update_link_fld_values(ll, old, new)
-	
-	# update options and values where select options contains old dt
-	select_flds = sql("select parent, fieldname from `tabDocField` where parent not like 'old%%' and options like '%%%s%%' and options not like 'link:%%' and fieldtype = 'Select' and parent != '%s'" % (old, new))
-	update_link_fld_values(select_flds, old, new)
-	
-	sql("update `tabDocField` set options = replace(options, '%s', '%s') where parent not like 'old%%' and options like '%%%s%%' and options not like 'link:%%' and fieldtype = 'Select' and parent != '%s'" % (old, new, old, new))
 
 	# doctype
-	if is_doctype:
+	if dt=='DocType':		
+		# update options and values where select options contains old dt
+		select_flds = sql("select parent, fieldname from `tabDocField` where parent not like 'old%%' and (options like '%%%s%%' or options like '%%%s%%') and options not like 'link:%%' and fieldtype = 'Select' and parent != '%s'" % ('\n' + old, old + '\n', new))
+		update_link_fld_values(select_flds, old, new)
+	
+		sql("update `tabDocField` set options = replace(options, '%s', '%s') where parent not like 'old%%' and (options like '%%%s%%' or options like '%%%s%%') and options not like 'link:%%' and fieldtype = 'Select' and parent != '%s'" % (old, new, '\n' + old, old + '\n', new))
+
 		if not is_single_dt(new):
 			sql("RENAME TABLE `tab%s` TO `tab%s`" % (old, new))
 		else:

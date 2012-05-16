@@ -8,6 +8,7 @@ wn.ui.Search = Class.extend({
 		wn.model.with_doctype(this.doctype, function(r) {
 			me.make();
 			me.dialog.show();
+			me.list.$w.find('.list-filters input[type="text"]').focus();
 		});
 	},
 	make: function() {
@@ -25,11 +26,18 @@ wn.ui.Search = Class.extend({
 			show_filters: true,
 			style: 'compact',
 			get_args: function() {
-				return {
-					doctype: me.doctype,
-					fields: [ '`tab' + me.doctype + '`.name'],
-					filters: me.list.filter_list.get_filters(),
-					docstatus: ['0','1']
+				if(me.query) {
+					me.page_length = 50; // there has to be a better way
+					return {
+						query: me.query
+					}
+				} else {
+					return {
+						doctype: me.doctype,
+						fields: [ '`tab' + me.doctype + '`.name'],
+						filters: me.list.filter_list.get_filters(),
+						docstatus: ['0','1']
+					}					
 				}
 			},
 			render_row: function(parent, data) {

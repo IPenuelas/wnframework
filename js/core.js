@@ -25,15 +25,15 @@
 if(!console) {
 	var console = {
 		log: function(txt) {
-			alert(txt);
+			// suppress
 		}
 	}
 }
 
-wn.versions.check();
 
 /* start the application */
-$(document).bind('ready', function() {
+$(document).ready(function() {
+	wn.versions.check();
 	wn.provide('wn.app');
 	$.extend(wn.app, new wn.Application());
 });

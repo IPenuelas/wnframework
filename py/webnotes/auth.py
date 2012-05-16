@@ -62,12 +62,12 @@ class HTTPRequest:
 			webnotes.msgprint(webnotes.conn.get_global("__session_status_message"))
 			raise webnotes.SessionStopped('Session Stopped')
 
+		# load profile
+		self.setup_profile()
+
 		# run login triggers
 		if webnotes.form_dict.get('cmd')=='login':
 			webnotes.login_manager.run_trigger('on_login_post_session')
-			
-		# load profile
-		self.setup_profile()
 
 		# write out cookies
 		webnotes.cookie_manager.set_cookies()
@@ -81,11 +81,12 @@ class HTTPRequest:
 
 	def setup_profile(self):
 		webnotes.user = webnotes.profile.Profile()
+		
 		# load the profile data
-		if webnotes.session['data'].get('profile'):
-			webnotes.user.load_from_session(webnotes.session['data']['profile'])
-		else:
-			webnotes.user.load_profile()
+		if not webnotes.session['data'].get('profile'):
+			webnotes.session['data']['profile'] = webnotes.user.load_profile()
+
+		webnotes.user.load_from_session(webnotes.session['data']['profile'])			
 
 	# set database login
 	# ------------------
@@ -242,7 +243,10 @@ class LoginManager:
 		if not user: user = webnotes.session.get('user')
 		self.user = user
 		self.run_trigger('on_logout')
-		webnotes.conn.sql('delete from tabSessions where user=%s', user)
+		if user=='demo@webnotestech.com':
+			webnotes.conn.sql('delete from tabSessions where sid=%s', webnotes.session.get('sid'))
+		else:
+			webnotes.conn.sql('delete from tabSessions where user=%s', user)
 		
 # =================================================================================
 # Cookie Manager
@@ -270,12 +274,7 @@ class CookieManager:
 	# Set cookies
 	# -----------
 	
-	def set_cookies(self):
-		if webnotes.form_dict.get('cmd')=='logout':
-			webnotes.cookies['account_id'] = ''
-		else:
-			webnotes.cookies['account_id'] = webnotes.conn.cur_db_name
-		
+	def set_cookies(self):		
 		if webnotes.session.get('sid'):
 			webnotes.cookies['sid'] = webnotes.session['sid']
 
@@ -283,6 +282,7 @@ class CookieManager:
 			import datetime
 			expires = datetime.datetime.now() + datetime.timedelta(days=3)
 			webnotes.cookies['sid']['expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S')		
+			webnotes.cookies['sid']['path'] = '/'
 
 	# Set Remember Me
 	# ---------------
@@ -305,7 +305,7 @@ class CookieManager:
 class Session:
 	def __init__(self, user=None):
 		self.user = user
-		self.sid = webnotes.form_dict.get('sid') or webnotes.incoming_cookies.get('sid')
+		self.sid = webnotes.form_dict.get('sid') or webnotes.incoming_cookies.get('sid', 'Guest')
 		self.data = {'user':user,'data':{}}
 
 		if webnotes.form_dict.get('cmd')=='login':
@@ -395,6 +395,10 @@ class Session:
 		"""expire non-guest sessions"""
 		exp_sec = webnotes.conn.get_value('Control Panel', None, 'session_expiry') or '6:00:00'
 		
+		# incase seconds is missing
+		if len(exp_sec.split(':')) == 2:
+			exp_sec = exp_sec + ':00'
+			
 		# set sessions as expired
 		try:
 			webnotes.conn.sql("""delete from tabSessions

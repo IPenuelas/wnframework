@@ -45,7 +45,7 @@ class DocType:
 		restricted = ('name','parent','idx','owner','creation','modified','modified_by','parentfield','parenttype')
 		for d in self.doclist:
 			if d.parent and d.fieldtype:
-				if (not d.fieldname) and (d.fieldtype.lower() in ('data', 'select', 'int', 'float', 'currency', 'table', 'text', 'link', 'date', 'code', 'check', 'read only', 'small_text', 'time')):
+				if (not d.fieldname):
 					d.fieldname = d.label.strip().lower().replace(' ','_')
 					if d.fieldname in restricted:
 						d.fieldname = d.fieldname + '1'
@@ -75,6 +75,7 @@ class DocType:
 		fieldnames = {}
 		illegal = ['.', ',', ' ', '-', '&', '%', '=', '"', "'", '*', '$']
 		for d in self.doclist:
+			if not d.permlevel: d.permlevel = 0
 			if d.parent and d.fieldtype and d.parent == self.doc.name:
 				# check if not double
 				if d.fieldname:
@@ -87,7 +88,10 @@ class DocType:
 					for c in illegal:
 						if c in d.fieldname:
 							webnotes.msgprint('"%s" not allowed in fieldname' % c)
-					
+				
+				else:
+					webnotes.msgprint("Fieldname is mandatory in row %s" % str(d.idx+1), raise_exception=1)
+				
 				# check illegal mandatory
 				if d.fieldtype in ('HTML', 'Button', 'Section Break', 'Column Break') and d.reqd:
 					webnotes.msgprint('%(lable)s [%(fieldtype)s] cannot be mandatory', raise_exception=1)

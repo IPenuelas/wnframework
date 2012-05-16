@@ -29,7 +29,7 @@ wn.request.url = 'index.cgi';
 wn.request.prepare = function(opts) {
 	// btn indicator
 	if(opts.btn) $(opts.btn).set_working();
-		
+	
 	// navbar indicator
 	if(opts.show_spinner) set_loading();
 	
@@ -54,9 +54,11 @@ wn.request.cleanup = function(opts, r) {
 	if(opts.freeze) unfreeze();
 
 	// session expired?
-	if(wn.boot.sid && wn.get_cookie('sid') != wn.boot.sid) { 
-		msgprint('Session expired');
-		setTimeout('wn.app.redirect_to_login()', 3000); 
+	if(wn.boot && wn.boot.sid && wn.get_cookie('sid') != wn.boot.sid) { 
+		if(!wn.app.logged_out) {
+			msgprint('Session Expired. Logging you out');
+			wn.app.logout();			
+		}
 		return;
 	}
 	

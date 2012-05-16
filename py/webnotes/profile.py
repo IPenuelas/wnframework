@@ -131,19 +131,6 @@ class Profile:
 		self.can_read += self.can_write
 		self.all_read += self.can_read
 
-	def get_home_page(self):
-		"""
-		Get the name of the user's home page from the `Control Panel`
-		"""
-		hpl = webnotes.conn.sql("""select home_page from `tabDefault Home Page` 
-			where parent='Control Panel' 
-			and role in ('%s') order by idx asc limit 1""" % "', '".join(self.get_roles()))
-			
-		if hpl:
-			return hpl[0][0]
-		else:
-			return webnotes.conn.get_value('Control Panel',None,'home_page') or 'Login Page'
-
 	def get_defaults(self):
 		"""
 		Get the user's default values based on user and role profile
@@ -248,6 +235,7 @@ class Profile:
 		self.can_create = d['can_create']
 		self.can_read = d['can_read']
 		self.can_write = d['can_write']
+		self.can_search = d['can_search']
 		self.can_get_report = d['can_get_report']
 		self.allow_modules = d['allow_modules']
 		self.all_read = d['all_read']

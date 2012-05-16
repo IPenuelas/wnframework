@@ -326,7 +326,7 @@ wn.views.ListView = Class.extend({
 		{width: '3%', content:'docstatus', css: {"text-align": "center"}},
 		{width: '35%', content:'name'},
 		{width: '40%', content:'tags', css: {'color':'#aaa'}},
-		{width: '15%', content:'modified', css: {'text-align': 'right', 'color':'#777'}}		
+		{width: '15%', content:'modified', css: {'text-align': 'right', 'color':'#222'}}		
 	],
 	render_column: function(data, parent, opts) {
 		var me = this;
@@ -382,6 +382,13 @@ wn.views.ListView = Class.extend({
 					style="width: %(percent)s%;"></span>\
 			</span>', args));
 		}
+		else if(opts.type=='link' && opts.doctype) {
+			$(parent).append(repl('<a href="#!Form/'+opts.doctype+'/'
+				+data[opts.content]+'">'+data[opts.content]+'</a>', data));
+		}
+		else if(opts.template) {
+			$(parent).append(repl(opts.template, data));
+		}
 		else if(data[opts.content]) {
 			$(parent).append(' ' + data[opts.content]);
 		}
@@ -411,7 +418,7 @@ wn.views.ListView = Class.extend({
 		data.when = dateutil.str_to_user(data.modified).split(' ')[0];
 		var diff = dateutil.get_diff(dateutil.get_today(), data.modified.split(' ')[0]);
 		if(diff==0) {
-			data.when = 'Today'
+			data.when = dateutil.comment_when(data.modified);
 		}
 		if(diff == 1) {
 			data.when = 'Yesterday'
@@ -430,7 +437,14 @@ wn.views.ListView = Class.extend({
 		} else if(data.docstatus==2) {
 			data.docstatus_icon = 'icon-remove';			
 			data.docstatus_title = 'Cancelled';
-		}		
+		}
+		
+		// nulls as strings
+		for(key in data) {
+			if(data[key]==null) {
+				data[key]='';
+			}
+		}
 	},
 	add_user_tags: function(parent, data) {
 		var me = this;

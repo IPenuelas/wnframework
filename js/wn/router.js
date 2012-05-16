@@ -37,6 +37,12 @@ wn.route = function() {
 }
 
 wn.get_route = function(route) {
+	// route for web
+	if(!wn.boot) {
+		return [window.page_name];
+	}
+	
+	// for app
 	return $.map(wn.get_route_str(route).split('/'), 
 		function(r) { return decodeURIComponent(r); });	
 }
@@ -64,13 +70,4 @@ $(window).bind('hashchange', function() {
 	if(location.hash==wn._cur_route)
 		return;	
 	wn.route();
-	
-	// analytics code
-	if(wn.boot.analytics_code) {
-		try {
-			eval(wn.boot.analytics_code);
-		} catch (e) {
-			console.log(e);
-		}
-	}
 });
