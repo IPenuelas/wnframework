@@ -38,7 +38,8 @@ wn.views.FormView = Class.extend({
 		this.form = new wn.ui.Form({
 			doctype: doctype,
 			name: name,
-			parent: this.$w
+			parent: this.$w,
+			page: this.page
 		});
 	},
 	make_page: function() {
@@ -59,7 +60,12 @@ wn.ui.Form = Class.extend({
 		this.controls = {};
 		this.fields = $.map(this.meta.get('DocField', {}), function(d) { return d.fields; });
 		this.make_form();
+		this.make_toolbar();
 		this.listen();
+	},
+	make_toolbar: function() {
+		var me = this;
+		this.page.appframe.add_button('Save', function() { me.save(); });
 	},
 	make_form: function() {
 		// form
@@ -101,7 +107,7 @@ wn.ui.Form = Class.extend({
 				if(me.controls[key]) me.controls[key].set_input(val);
 			});
 		}
-	}
+	},
 });
 
 wn.ui.make_control = function(opts) {
