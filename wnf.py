@@ -120,6 +120,9 @@ def setup_options():
 	parser.add_option('--install', nargs=3, metavar = "rootpassword dbname source",
 						help="install fresh db")
 	
+	# setup
+	parser.add_option('--setup', nargs=0, help="setup public folder")
+	
 	# diff
 	parser.add_option('--diff_ref_file', nargs=0, \
 						help="Get missing database records and mismatch properties, with file as reference")
@@ -170,7 +173,7 @@ def run():
 	# build
 	if options.build:
 		import build.project
-		build.project.build()	
+		build.project.build()
 
 	elif options.cms:
 		from webnotes.model.code import get_obj
@@ -240,6 +243,46 @@ def run():
 		inst = Installer('root', options.install[0])
 		inst.import_from_db(options.install[1], source_path=options.install[2], \
 			password='admin', verbose = 1)
+			
+	elif options.setup is not None:
+		import os, shutil
+		if not os.path.exists('public/css'):
+			os.makedirs('public/css')
+		if not os.path.exists('public/js'):
+			os.makedirs('public/js')
+		if not os.path.exists('public/files'):
+			os.makedirs('public/files')
+		if not os.path.exists('public/backups'):
+			os.makedirs('public/backups')
+		if not os.path.exists('public/images'):
+			os.makedirs('public/images')
+		
+		# symlink libs
+		if not os.path.exists('public/js/lib'):
+			os.symlink(os.path.abspath('lib/js/lib'), 'public/js/lib')
+		if not os.path.exists('public/images/lib'):
+			os.symlink(os.path.abspath('lib/images'), 'public/images/lib')
+		
+		# copy app and index
+		if not os.path.exists('public/app.html'):
+			shutil.copyfile('lib/conf/public/app.html', 'public/app.html')
+		if not os.path.exists('public/index.cgi'):
+			shutil.copyfile('lib/conf/public/index.cgi', 'public/index.cgi')
+			import stat
+			os.chmod('public/index.cgi', stat.S_IRWXU | stat.S_IRWXG | stat.S_IXOTH)
+			
+		if not os.path.exists('public/sitemap.xml'):
+			shutil.copyfile('lib/conf/public/sitemap.xml', 'public/sitemap.xml')
+		if not os.path.exists('public/unsupported.html'):
+			shutil.copyfile('lib/conf/public/unsupported.html', 'public/unsupported.html')
+
+		# make index, login page
+		from webnotes.cms.make import make_web_core
+		make_web_core()
+
+		# build
+		import build.project
+		build.project.build()
 	
 	elif options.diff_ref_file is not None:
 		import webnotes.modules.diff

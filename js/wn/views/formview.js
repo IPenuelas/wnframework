@@ -55,7 +55,7 @@ wn.views.FormView = Class.extend({
 wn.ui.Form = Class.extend({
 	init: function(opts) {
 		$.extend(this, opts);
-		this.doc = wn.model.get(this.doctype, this.name);
+		this.doclist = wn.model.get(this.doctype, this.name);
 		this.meta = wn.model.get('DocType', this.doctype);
 		this.controls = {};
 		this.fields = $.map(this.meta.get('DocField', {}), function(d) { return d.fields; });
@@ -65,7 +65,13 @@ wn.ui.Form = Class.extend({
 	},
 	make_toolbar: function() {
 		var me = this;
-		this.page.appframe.add_button('Save', function() { me.save(); });
+		this.page.appframe.add_button('Save', function() { 
+			var btn = this;
+			$(this).html('Saving...').attr('disabled', 'disabled');
+			me.doclist.save(0, function() {
+				$(this).attr('disabled', false).html('Save');
+			});
+		});
 	},
 	make_form: function() {
 		// form
@@ -108,6 +114,9 @@ wn.ui.Form = Class.extend({
 			});
 		}
 	},
+	save: function(callback) {
+
+	}
 });
 
 wn.ui.make_control = function(opts) {

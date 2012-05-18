@@ -19,4 +19,7 @@ def get_home_page(user=None):
 	if hpl:
 		return hpl[0][0]
 	else:
-		return webnotes.conn.get_value('Control Panel',None,'home_page') or 'Login Page'	
+		if user=='Guest':
+			return 'Login Page'
+		else:
+			return webnotes.conn.get_value('Control Panel',None,'home_page') or 'Login Page'

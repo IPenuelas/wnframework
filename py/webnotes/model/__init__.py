@@ -228,34 +228,6 @@ def clear_recycle_bin():
 			sql("delete from `%s` where parent like 'old_parent:%%'" % t[0])
 
 	webnotes.msgprint("%s records deleted" % str(int(total_deleted)))
-	
-	
-# Make Table Copy
-#=================================================================================
-
-def copytables(srctype, src, srcfield, tartype, tar, tarfield, srcfields, tarfields=[]):
-	import webnotes.model.doc
-
-	if not tarfields: 
-		tarfields = srcfields
-	l = []
-	data = webnotes.model.doc.getchildren(src.name, srctype, srcfield)
-	for d in data:
-		newrow = webnotes.model.doc.addchild(tar, tarfield, tartype, local = 1)
-		newrow.idx = d.idx
-	
-		for i in range(len(srcfields)):
-			newrow.fields[tarfields[i]] = d.fields[srcfields[i]]
-			
-		l.append(newrow)
-	return l
-
-# DB Exists
-#=================================================================================
-
-def db_exists(dt, dn):
-	import webnotes
-	return webnotes.conn.exists(dt, dn)
 
 
 def delete_fields(args_dict, delete=0):

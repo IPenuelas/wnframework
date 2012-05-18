@@ -21,7 +21,7 @@ def make_web_core():
 	import webnotes
 	
 	home_page = webnotes.cms.get_home_page('Guest')
-	get_obj('Page', home_page).write_cms_page()
+	get_obj('Page', home_page).write_cms_page(force=True)
 
 	# js/wn-web.js and css/wn-web.css
 	write_web_js_css(home_page)
@@ -37,19 +37,18 @@ def write_web_js_css(home_page):
 	if os.path.basename(os.path.abspath('.'))!='public':
 		fname = os.path.join('public', fname)
 			
-	if hasattr(startup.event_handlers, 'get_web_script'):
-		with open(fname, 'w') as f:
-
+	with open(fname, 'w') as f:
+		if hasattr(startup.event_handlers, 'get_web_script'):
 			script = 'window.home_page = "%s";\n' % home_page
 			script += startup.event_handlers.get_web_script()
 
 			f.write(script)
-
+			
 	fname = 'css/wn-web.css'
 	if os.path.basename(os.path.abspath('.'))!='public':
 		fname = os.path.join('public', fname)
 
 	# style - wn.css
-	if hasattr(startup.event_handlers, 'get_web_style'):
-		with open(fname, 'w') as f:
+	with open(fname, 'w') as f:
+		if hasattr(startup.event_handlers, 'get_web_style'):
 			f.write(startup.event_handlers.get_web_style())

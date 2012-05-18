@@ -36,7 +36,6 @@ def getdoc():
 	
 	form = webnotes.form_dict
 	doctype, docname = form.get('doctype'), form.get('name')
-	prefix = cint(form.get('from_archive')) and 'arc' or 'tab'
 
 	if not (doctype and docname):
 		raise Exception, 'doctype and name required!'
@@ -44,15 +43,6 @@ def getdoc():
 	doclist = []
 	# single
 	doclist = load_single_doc(doctype, docname, (form.get('user') or webnotes.session['user']), prefix)
-	
-	# load doctype along with the doc
-	if form.get('getdoctype'):
-		import webnotes.model.doctype
-		doclist += webnotes.model.doctype.get(doctype)
-
-	# tag as archived
-	if prefix == 'arc':
-		doclist[0].__archived=1
 
 	webnotes.response['docs'] = doclist
 
@@ -65,14 +55,6 @@ def getdoctype():
 	form, doclist = webnotes.form, []
 	
 	dt = form.getvalue('doctype')
-	with_parent = form.getvalue('with_parent')
-
-	# with parent (called from report builder)
-	if with_parent:
-		parent_dt = webnotes.model.meta.get_parent_dt(dt)
-		if parent_dt:
-			doclist = webnotes.model.doctype.get(parent_dt)
-			webnotes.response['parent_dt'] = parent_dt
 	
 	if not doclist:
 		doclist = webnotes.model.doctype.get(dt)
@@ -93,10 +75,6 @@ def load_single_doc(dt, dn, user, prefix):
 	if not dn: dn = dt
 	dl = webnotes.model.doc.get(dt, dn, prefix=prefix)
 
-	# archive, done
-	if prefix=='arc':
-		return dl
-
 	try:
 		so, r = webnotes.model.code.get_server_obj(dl[0], dl), None
 		if hasattr(so, 'onload'):
@@ -112,10 +90,6 @@ def load_single_doc(dt, dn, user, prefix):
 
 	if dl and not dn.startswith('_'):
 		webnotes.user.update_recent(dt, dn)
-
-	# load search criteria ---- if doctype
-	if dt=='DocType':
-		dl += get_search_criteria(dt)
 
 	return dl
 

@@ -78,10 +78,11 @@ wn.model = {
 				wn.meta.add_field(doc);
 		}
 	},
+	// return doclist
 	get: function(dt, dn) {
-		if(wn.doclists[dt] && wn.doclists[dt][dn]) {
-			return wn.doclists[dt][dn];
-		}
+		wn.with_doc(dt, dn, function() {
+			return wn.doclists[dt][dn];			
+		});
 	},
 	has: function(dt, dn) {
 		if(wn.doclists[dt] && wn.doclists[dt][dn]) return true;
@@ -191,7 +192,8 @@ wn.model.DocList = Class.extend({
 		}
 		return doc;
 	},
-	save: function(callback) {
+	// save doclist
+	save: function(docstatus, callback) {
 		
 	}
 });

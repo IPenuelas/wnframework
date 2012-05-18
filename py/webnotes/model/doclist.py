@@ -35,23 +35,22 @@ class DocList:
 	Collection of Documents with one parent and multiple children
 	"""
 	def __init__(self, dt=None, dn=None):
-		self.docs = []
+		self.doclist = []
 		self.obj = None
 		self.to_docstatus = 0
 		if dt and dn:
 			self.load_from_db(dt, dn)
 		if type(dt) is list:
-			self.docs = dt
+			self.doclist = dt
 			self.doc = dt[0]
-			self.children = dt[1:]
 
-	def load_from_db(self, dt, dn, prefix='tab'):
+	def load_from_db(self, dt, dn):
 		"""
 			Load doclist from dt
 		"""
 		from webnotes.model.doc import Document, getchildren
 
-		doc = Document(dt, dn, prefix=prefix)
+		doc = Document(dt, dn)
 
 		# get all children types
 		tablefields = webnotes.model.meta.get_table_fields(dt)
@@ -59,35 +58,38 @@ class DocList:
 		# load chilren
 		doclist = [doc,]
 		for t in tablefields:
-			doclist += getchildren(doc.name, t[0], t[1], dt, prefix=prefix)
+			doclist += getchildren(doc.name, t[0], t[1], dt)
 
-		self.docs = doclist
+		self.doclist = doclist
 		self.doc = doc
-		self.children = doclist[1:]
+		self.run_method('onload')
 
 	def __iter__(self):
 		"""
 			Make this iterable
 		"""
-		return self.docs.__iter__()
+		return self.doclist.__iter__()
 
 	def from_compressed(self, data, docname):
 		"""
 			Expand called from client
 		"""
 		from webnotes.model.utils import expand
-		self.docs = expand(data)
+		self.doclist = expand(data)
 		self.objectify(docname)
+
+	def get_compressed(self):
+		from webnotes.model.utils import compress
+		return compress(self.doclist)
 
 	def objectify(self, docname=None):
 		"""
-			Converts self.docs from a list of dicts to list of Documents
+			Converts self.doclist from a list of dicts to list of Documents
 		"""
 		from webnotes.model.doc import Document
 
-		self.docs = [Document(fielddata=d) for d in self.docs]
-		self.doclist = self.docs
-		self.doc, self.children = self.docs[0], self.docs[1:]
+		self.doclist = [Document(fielddata=d) for d in self.doclist]
+		self.doc = self.doclist[0]
 
 	def make_obj(self):
 		"""
@@ -96,20 +98,20 @@ class DocList:
 		if self.obj: return self.obj
 
 		from webnotes.model.code import get_obj
-		self.obj = get_obj(doc=self.doc, doclist=self.children)
+		self.obj = get_obj(doc=self.doc, doclist=self.doclist[1:])
 		return self.obj
 
 	def next(self):
 		"""
 			Next doc
 		"""
-		return self.docs.next()
+		return self.doclist.next()
 
 	def to_dict(self):
 		"""
 			return as a list of dictionaries
 		"""
-		return [d.fields for d in self.docs]
+		return [d.fields for d in self.doclist]
 
 	def check_if_latest(self):
 		"""
@@ -140,7 +142,7 @@ class DocList:
 			Checks integrity of links (throws exception if links are invalid)
 		"""
 		ref, err_list = {}, []
-		for d in self.docs:
+		for d in self.doclist:
 			if not ref.get(d.doctype):
 				ref[d.doctype] = d.make_link_list()
 
@@ -158,7 +160,7 @@ class DocList:
 		ts = now()
 		user = webnotes.__dict__.get('session', {}).get('user') or 'Administrator'
 
-		for d in self.docs:
+		for d in self.doclist:
 			if self.doc.fields.get('__islocal'):
 				d.owner = user
 				d.creation = ts
@@ -209,7 +211,7 @@ class DocList:
 		"""
 			Save Children, with the new parent name
 		"""
-		for d in self.children:
+		for d in self.doclist[1:]:
 			deleted, local = d.fields.get('__deleted',0), d.fields.get('__islocal',0)
 
 			if cint(local) and cint(deleted):
@@ -269,7 +271,7 @@ class DocList:
 # clone
 
 def clone(source_doclist):
-	""" Copy previous invoice and change dates"""
+	"""clone doclist"""
 	from webnotes.model.doc import Document
 	new_doclist = []
 	new_parent = Document(fielddata = source_doclist.doc.fields.copy())
@@ -330,3 +332,14 @@ def copy_doclist(doclist, no_copy = []):
 	import webnotes.model.utils
 	return webnotes.model.utils.copy_doclist(doclist, no_copy)
 
+@webnotes.whitelist()
+def get(doctype=None, name=None):
+	if not doctype or not name:
+		doctype, name = webnotes.form_dict.get('doctype'), webnotes.form_dict.get('name')
+	
+	if webnotes.form_dict.get('doctype'):
+		webnotes.response['docs'] = DocList(doctype, name).get_compressed()
+	else:
+		return DocList(doctype, name)
+	
+	

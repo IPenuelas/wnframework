@@ -41,6 +41,7 @@
 			"lib/css/bootstrap/dropdown.css",
 			"lib/css/bootstrap/tooltip.css",
 			"lib/css/bootstrap/icons.css",
+			"lib/css/bootstrap/form.css",
 			"lib/css/legacy/body.css",
 			"lib/css/legacy/messages.css",
 			"lib/css/legacy/dialog.css",
