@@ -136,7 +136,7 @@
 			"lib/js/legacy/model/local_data.js",
 			"lib/js/legacy/model/doclist.js",
 			"lib/js/wn/ui/toolbar.min.js:concat",
-			"lib/js/wn/views/breadcrumbs.js",
+			"lib/js/wn/ui/breadcrumbs.js",
 			"lib/js/wn/app.js"
 		]
 	}

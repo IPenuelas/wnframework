@@ -33,7 +33,7 @@ wn.views.formview = {
 wn.views.FormView = Class.extend({
 	init: function(doctype, name) {
 		this.make_page();
-		wn.views.breadcrumbs($(this.page).find('.appframe-title'), 
+		wn.views.breadcrumbs($('<span>').appendTo($(this.page).find('.appframe-titlebar')), 
 			wn.model.get_value('DocType', doctype, 'module'), doctype, name);
 		this.form = new wn.ui.Form({
 			doctype: doctype,
