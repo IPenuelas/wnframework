@@ -38,11 +38,12 @@ class DocList:
 		self.doclist = []
 		self.obj = None
 		self.to_docstatus = 0
-		if dt and dn:
-			self.load_from_db(dt, dn)
 		if type(dt) is list:
 			self.doclist = dt
 			self.doc = dt[0]
+		elif dt and dn:
+			self.load_from_db(dt, dn)
+
 
 	def load_from_db(self, dt, dn):
 		"""
@@ -69,18 +70,6 @@ class DocList:
 			Make this iterable
 		"""
 		return self.doclist.__iter__()
-
-	def from_compressed(self, data, docname):
-		"""
-			Expand called from client
-		"""
-		from webnotes.model.utils import expand
-		self.doclist = expand(data)
-		self.objectify(docname)
-
-	def get_compressed(self):
-		from webnotes.model.utils import compress
-		return compress(self.doclist)
 
 	def objectify(self, docname=None):
 		"""
@@ -337,9 +326,12 @@ def get(doctype=None, name=None):
 	if not doctype or not name:
 		doctype, name = webnotes.form_dict.get('doctype'), webnotes.form_dict.get('name')
 	
-	if webnotes.form_dict.get('doctype'):
-		webnotes.response['docs'] = DocList(doctype, name).get_compressed()
+	if webnotes.form_dict.get('cmd')=='webnotes.model.doclist.get':
+		webnotes.response['docs'] = DocList(doctype, name).doclist
 	else:
 		return DocList(doctype, name)
-	
+
+@webnotes.whitelist()
+def save(doclist=None):
+	pass
 	

@@ -370,14 +370,20 @@ class _DocType:
 		json_doclist = json.dumps([d.fields for d in doclist])
 		CacheItem(self.name).set(json_doclist)
 
-def get(dt, form=1):
+@webnotes.whitelist()
+def get(dt=None, form=1):
 	"""
 	Load "DocType" - called by form builder, report buider and from code.py (when there is no cache)
 	"""
-	if not dt: return []
+	if not dt:
+		dt = webnotes.form_dict.get('doctype')
 
-	doclist = _DocType(dt).make_doclist(form)	
-	return doclist
+	doclist = _DocType(dt).make_doclist(form)
+	
+	if webnotes.form_dict.get('cmd')=='webnotes.model.doctype.get':
+		webnotes.response['docs'] = doclist
+	else:
+		return doclist
 
 # Deprecate after import_docs rewrite
 def get_field_property(dt, fieldname, property):

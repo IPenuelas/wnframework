@@ -35,11 +35,14 @@ wn.model = {
 			callback();
 		} else {
 			wn.call({
-				method:'webnotes.widgets.form.load.getdoctype',
+				method:'webnotes.model.doctype.get',
 				args: {
 					doctype: doctype
 				},
-				callback: callback
+				callback: function(r) {
+					wn.model.sync(r.docs);
+					callback(r);
+				}
 			});
 		}
 	},
@@ -49,12 +52,15 @@ wn.model = {
 			callback(name);
 		} else {
 			wn.call({
-				method: 'webnotes.widgets.form.load.getdoc',
+				method:'webnotes.model.doclist.get',
 				args: {
 					doctype: doctype,
 					name: name
 				},
-				callback: function(r) { callback(name, r); }
+				callback: function(r) {
+					wn.model.sync(r.docs);
+					callback(name, r);
+				}
 			});
 		}
 	},
@@ -72,17 +78,11 @@ wn.model = {
 			} else {
 				new wn.model.DocList([doc]);
 			}
-
-			// sync metadata
-			if(doc.doctype=='DocField') 
-				wn.meta.add_field(doc);
 		}
 	},
 	// return doclist
 	get: function(dt, dn) {
-		wn.with_doc(dt, dn, function() {
-			return wn.doclists[dt][dn];			
-		});
+		return wn.doclists[dt] && wn.doclists[dt][dn];
 	},
 	has: function(dt, dn) {
 		if(wn.doclists[dt] && wn.doclists[dt][dn]) return true;
@@ -96,10 +96,12 @@ wn.model = {
 	set_value: function(dt, dn, fieldname, value) {
 		wn.model.get(dt, dn).doc.set(fieldname, value);
 	},
-	// change event
+	remove: function(dt, dn) {
+		delete wn.doclists[dt][dn];
+	},
+	// naming style for onchange events
 	event_name: function(dt, dn) {
 		return 'change-'+dt.replace(/ /g, '_')+'-' + dn.replace(/ /g, '_');
-		
 	}
 }
 
@@ -194,6 +196,14 @@ wn.model.DocList = Class.extend({
 	},
 	// save doclist
 	save: function(docstatus, callback) {
-		
+		wn.call({
+			method: 'webnotes.model.doclist.save',
+			args: {
+				docs: this.doclist
+			},
+			callback: function(r) {
+				wn.remove()
+			}
+		});
 	}
 });

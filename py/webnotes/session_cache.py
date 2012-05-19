@@ -93,7 +93,8 @@ def add_to_cache(bootinfo, country):
 	import webnotes.model.utils
 
 	if bootinfo.get('docs'):
-		bootinfo['docs'] = webnotes.model.utils.compress(bootinfo['docs'])
+		bootinfo['docs'] = map(lambda d: (type(d) is not dict) and d.fields or d, 
+			bootinfo['docs'])
 
 	# delete earlier (?)
 	webnotes.conn.sql("""delete from __SessionCache where user=%s 

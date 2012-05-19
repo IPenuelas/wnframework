@@ -93,8 +93,6 @@
 			"lib/js/legacy/webpage/spinner.js",
 			"lib/js/legacy/webpage/loaders.js",
 			"lib/js/legacy/wn/widgets/footer.js",
-			"lib/js/legacy/model/local_data.js",
-			"lib/js/legacy/model/doclist.js",
 			"lib/js/wn/app.js"
 		]
 	},
@@ -134,8 +132,6 @@
 			"lib/js/legacy/webpage/loaders.js",
 			"lib/js/legacy/wn/page_layout.js",
 			"lib/js/legacy/wn/widgets/footer.js",
-			"lib/js/legacy/model/local_data.js",
-			"lib/js/legacy/model/doclist.js",
 			"lib/js/wn/ui/toolbar.min.js:concat",
 			"lib/js/wn/ui/breadcrumbs.js",
 			"lib/js/wn/app.js"

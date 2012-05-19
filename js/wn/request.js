@@ -72,9 +72,6 @@ wn.request.cleanup = function(opts, r) {
 	if(r['403']) {
 		wn.container.change_to('403');
 	}
-
-	// sync docs
-	if(r.docs) wn.model.sync(expand_doclist(r.docs));
 }
 
 wn.request.call = function(opts) {

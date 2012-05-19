@@ -77,10 +77,6 @@ wn.ui.toolbar.SelectorDialog = Class.extend({
 		return false;
 	},
 	set_values: function(lst) {
-		// convert to labels
-		for(var i=0;i<lst.length;i++) 
-			lst[i]=get_doctype_label(lst[i]);
-		
 		// set values
 		var $sel = this.dialog.fields_dict.doctype.$input;
 		$sel.empty().add_options(lst.sort());	

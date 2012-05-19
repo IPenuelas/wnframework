@@ -68,7 +68,7 @@ wn.Application = Class.extend({
 	},
 	load_bootinfo: function() {
 		if(wn.boot) {
-			wn.model.sync(expand_doclist(wn.boot.docs));
+			wn.model.sync(wn.boot.docs);
 			wn.control_panel = wn.boot.control_panel;
 
 			if(wn.boot.error_messages)

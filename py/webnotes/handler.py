@@ -43,11 +43,6 @@ def startup():
 
 	webnotes.response.update(webnotes.session_cache.get())
 
-def cleanup_docs():
-	import webnotes.model.utils
-	if webnotes.response.get('docs') and type(webnotes.response['docs'])!=dict:
-		webnotes.response['docs'] = webnotes.model.utils.compress(webnotes.response['docs'])
-
 # server calls
 # ------------------------------------------------------------------------------------
 
@@ -73,7 +68,6 @@ def dt_map():
 	
 	form_dict = webnotes.form_dict
 	
-	dt_list = webnotes.model.utils.expand(form_dict.get('docs'))
 	from_doctype = form_dict.get('from_doctype')
 	to_doctype = form_dict.get('to_doctype')
 	from_docname = form_dict.get('from_docname')
@@ -252,6 +246,10 @@ def print_response():
 	import string
 	import os
 
+	if webnotes.response.get('docs'):
+		webnotes.response['docs'] = map(lambda d: (type(d) is not dict) and d.fields or d, 
+			webnotes.response['docs'])
+
 	if webnotes.response.get('type')=='csv':
 		print_csv()
 	elif webnotes.response.get('type')=='iframe':
@@ -297,7 +295,6 @@ def print_raw():
 
 def print_json():
 	make_logs()
-	cleanup_docs()
 
 	import json
 	str_out = json.dumps(webnotes.response)

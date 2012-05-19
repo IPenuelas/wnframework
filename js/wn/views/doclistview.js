@@ -38,7 +38,7 @@ wn.views.doclistview.show = function(doctype) {
 wn.views.DocListView = wn.ui.Listing.extend({
 	init: function(doctype) {
 		this.doctype = doctype;
-		this.label = get_doctype_label(doctype);
+		this.label = doctype;
 		this.label = (this.label.toLowerCase().substr(-4) == 'list') ?
 		 	this.label : (this.label + ' List');
 		this.make_page();
@@ -140,7 +140,7 @@ wn.views.DocListView = wn.ui.Listing.extend({
 				onclick="newdoc(\'%(doctype)s\');"\
 				>Make a new %(doctype_label)s</button>\
 		</p></div>', {
-			doctype_label: get_doctype_label(this.doctype),
+			doctype_label: this.doctype,
 			doctype: this.doctype,
 			description: wn.markdown(this.meta.get('description') || '')
 		});

@@ -24,66 +24,6 @@
 Model utilities, unclassified functions
 """
 
-def expand(docs):
-	"""
-		Expand a doclist sent from the client side. (Internally used by the request handler)
-	"""
-	def xzip(a,b):
-		d = {}
-		for i in range(len(a)):
-			d[a[i]] = b[i]
-		return d
-
-	from webnotes.utils import load_json
-
-	docs = load_json(docs)
-	clist = []
-	for d in docs['_vl']:
-		doc = xzip(docs['_kl'][d[0]], d);
-		clist.append(doc)
-	return clist
-
-def compress(doclist):
-	"""
-	   Compress a doclist before sending it to the client side. (Internally used by the request handler)
-
-	"""
-	if doclist and hasattr(doclist[0],'fields'):
-		docs = [d.fields for d in doclist]
-	else:
-		docs = doclist
-
-	kl, vl = {}, []
-	forbidden = ['server_code_compiled']
-
-	# scan for keys & values
-	for d in docs:
-		dt = d['doctype']
-		if not (dt in kl.keys()):
-			kl[dt] = ['doctype','localname','__oldparent','__unsaved']	
-
-		# add client script for doctype, doctype due to ambiguity
-		if dt=='DocType' and '__client_script' not in kl[dt]: 
-			kl[dt].append('__client_script')
-
-		for f in d.keys():
-			if not (f in kl[dt]) and not (f in forbidden):
-				# if key missing, then append
-				kl[dt].append(f)
-
-		# build values
-		tmp = []
-		for f in kl[dt]:
-			v = d.get(f)
-			if type(v)==long:
-				v=int(v)
-			tmp.append(v)
-
-		vl.append(tmp)
-	#errprint(str({'_vl':vl,'_kl':kl}))
-	return {'_vl':vl,'_kl':kl}
-
-
 def getlist(doclist, field):
 	"""
    Filter a list of records for a specific field from the full doclist
