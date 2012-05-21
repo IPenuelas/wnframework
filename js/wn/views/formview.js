@@ -13,12 +13,23 @@ wn.views.formview = {
 					wn.container.change_to('404');
 					return;
 				}
-
-				var page_name = wn.get_route_str();
-				if(wn.contents[page_name]) {
-					wn.container.change_to(page_name);
+				
+				if(wn.model.get('DocType', dt).get_value('in_dialog')) {
+					// dialog
+					var form_dialog = new wn.views.FormDialog({
+						doctype: dt,
+						name: dn
+					});
+					
+					form_dialog.show();
 				} else {
-					new wn.views.FormView(dt, dn);					
+					// page
+					var page_name = wn.get_route_str();
+					if(wn.contents[page_name]) {
+						wn.container.change_to(page_name);
+					} else {
+						new wn.views.FormPage(dt, dn);					
+					}					
 				}
 				
 			});
@@ -30,7 +41,33 @@ wn.views.formview = {
 	}
 }
 
-wn.views.FormView = Class.extend({
+// opts
+// - doctype
+// - name
+// - fields (if custom)
+
+wn.views.FormDialog = wn.ui.Dialog.extend({
+	init: function(opts) {
+		$.extend(this, opts);
+		_.get_or_set(this, 'width', 600);
+		_.get_or_set(this, 'title', name);
+		
+		// init dialog
+		this._super();
+		
+		this.form = new wn.ui.Form({
+			doctype: this.doctype,
+			name: this.name,
+			fields: this.fields,
+			parent: this.body,
+			appframe: this.appframe
+		});
+	}
+})
+
+// form in a page
+
+wn.views.FormPage = Class.extend({
 	init: function(doctype, name) {
 		this.make_page();
 		wn.views.breadcrumbs($('<span>').appendTo($(this.page).find('.appframe-titlebar')), 
@@ -39,7 +76,7 @@ wn.views.FormView = Class.extend({
 			doctype: doctype,
 			name: name,
 			parent: this.$w,
-			page: this.page
+			appframe: this.page.appframe
 		});
 	},
 	make_page: function() {
@@ -52,20 +89,27 @@ wn.views.FormView = Class.extend({
 });
 
 // build a form from a set of fields
+
 wn.ui.Form = Class.extend({
 	init: function(opts) {
 		$.extend(this, opts);
-		this.doclist = wn.model.get(this.doctype, this.name);
-		this.meta = wn.model.get('DocType', this.doctype);
 		this.controls = {};
-		this.fields = $.map(this.meta.get('DocField', {}), function(d) { return d.fields; });
+
+		if(this.doctype && this.name) {
+			this.doclist = wn.model.get(this.doctype, this.name);			
+		}
+
+		if(this.doctype) {
+			this.fields = $.map(wn.model.get('DocType', this.doctype)
+				.get('DocField', {}), function(d) { return d.fields; });			
+		}
 		this.make_form();
 		this.make_toolbar();
 		this.listen();
 	},
 	make_toolbar: function() {
 		var me = this;
-		this.page.appframe.add_button('Save', function() { 
+		this.appframe.add_button('Save', function() { 
 			var btn = this;
 			$(this).html('Saving...').attr('disabled', 'disabled');
 			me.doclist.save(0, function() {

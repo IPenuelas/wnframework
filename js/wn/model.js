@@ -186,6 +186,9 @@ wn.model.DocList = Class.extend({
 		}
 		return $.map(this.doclist, function(d) { return me.match(filters, d) });
 	},
+	get_value: function(key, def) {
+		return this.doc.get(key, def);
+	},
 	match: function(filters, doc) {
 		for(key in filters) {
 			if(doc.get(key)!=filters[key]) {
