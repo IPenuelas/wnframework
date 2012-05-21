@@ -323,12 +323,10 @@ def accept_gzip():
 def make_logs():
 	"""make strings for msgprint and errprint"""
 	if webnotes.debug_log:
-		t = '\n----------------\n'.join(webnotes.debug_log)
-		webnotes.response['exc'] = t
+		webnotes.response['exc'] = webnotes.debug_log
 
 	if webnotes.message_log:
-		t = '\n----------------\n'.join(webnotes.message_log)
-		webnotes.response['server_messages'] = t	
+		webnotes.response['server_messages'] = webnotes.message_log
 
 def print_cookies():
 	"""if there ar additional cookies defined during the request, add them"""

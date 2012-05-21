@@ -70,6 +70,9 @@ wn.ui.Listing = Class.extend({
 				this.opts.new_doctype = this.opts.new_doctype;
 			}
 		}
+		_.get_or_set(this.opts, 'no_result_message', 'Nothing to show.');
+		_.get_or_set(this.opts, 'title', '');
+
 		if(!this.opts.no_result_message) {
 			this.opts.no_result_message = 'Nothing to show'
 		}

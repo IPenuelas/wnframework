@@ -39,20 +39,15 @@ def scrub_dt_dn(dt, dn):
 	return ndt, ndn
 			
 def get_module_path(module):
-	"""Returns path of the given module"""
-	import os, conf
+	"""Returns path of the given module, or the root folder of the app"""
+	import os, conf, webnotes
 	m = scrub(module)
-	
+	root_path = webnotes.root_path()
+			
 	if m in ('core'):
-		if os.path.exists('public'):
-			return os.path.join('..', 'lib', 'py', 'core')
-		else:
-			return os.path.join('.', 'lib', 'py', 'core')
+		return os.path.join(root_path, 'lib', 'py', 'core')
 	else:
-		if os.path.exists('public'):
-			return os.path.join('..', 'modules', m)
-		else:
-			return os.path.join('..', 'modules', m)
+		return os.path.join(root_path, 'modules', m)
 
 def reload_doc(module, dt=None, dn=None):
 	"""reload single / list of records"""
@@ -97,10 +92,9 @@ def export_doc(doctype, name):
 
 def get_all_modules():
 	"""Return list of all modules"""
-	import conf
+	import webnotes
 	from webnotes.modules.utils import listfolders
 
-	if hasattr(conf, 'modules_path'):
-		return listfolders(conf.modules_path, 1)
+	return listfolders(webnotes.modules_path(), 1)
 			
 		

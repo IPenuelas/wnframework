@@ -227,8 +227,9 @@ wn.views.DocListView = wn.ui.Listing.extend({
 			return;
 		}
 		
-		var label = wn.meta.docfield_map[this.doctype][field] ? 
-			wn.meta.docfield_map[this.doctype][field].label : field;
+		var df = wn.model.get('DocType', this.doctype).get({doctype:'DocField', fieldname:field});
+		var label = df.length ? df[0].label : field;
+		
 		if(label=='_user_tags') label = 'Tags';
 		
 		// grid

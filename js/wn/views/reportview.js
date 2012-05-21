@@ -89,7 +89,7 @@ wn.views.ReportView = wn.ui.Listing.extend({
 	set_init_columns: function() {
 		// pre-select mandatory columns
 		var columns = [['name'], ['owner']];
-		$.each(wn.meta.docfield_list[this.doctype], function(i, df) {
+		$.each(wn.model.get('DocType', this.doctype).get({doctype:'DocField'}), function(i, df) {
 			if(df.in_filter && df.fieldname!='naming_series') {
 				columns.push([df.fieldname]);
 			}
@@ -170,13 +170,17 @@ wn.views.ReportView = wn.ui.Listing.extend({
 	build_columns: function() {
 		var me = this;
 		return $.map(this.columns, function(c) {
-			var docfield = wn.meta.docfield_map[c[1] || me.doctype][c[0]];
+			var docfield = wn.model.get('DocType', [c[1] || me.doctype]).get({
+				doctype: 'DocField', fieldname: c[0]});
+				
+			docfield = docfield.length ? docfield[0] : null;
+				
 			coldef = {
 				id: c[0],
 				field: c[0],
 				docfield: docfield,
 				name: (docfield ? docfield.label : toTitle(c[0])),
-				width: (docfield ? cint(docfield.width) : 120) || 120
+				width: (docfield ? parseInt(docfield.width) : 120) || 120
 			}
 						
 			if(c[0]=='name') {

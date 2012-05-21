@@ -108,7 +108,7 @@ class DocType:
 		"""
 		from webnotes.modules import get_module_path, scrub
 		import os
-		
+				
 		path = os.path.join(get_module_path(self.doc.module), 'page', scrub(self.doc.name))
 
 		# script

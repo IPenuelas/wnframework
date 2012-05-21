@@ -38,7 +38,7 @@ wn.ui.toolbar.Toolbar = Class.extend({
 		$('header').append('<div class="navbar navbar-fixed-top">\
 			<div class="navbar-inner">\
 			<div class="container">\
-				<a class="brand"></a>\
+				<a class="brand">Home</a>\
 				<ul class="nav">\
 				</ul>\
 				<img src="images/lib/ui/spinner.gif" id="spinner"/>\
@@ -108,7 +108,6 @@ wn.ui.toolbar.clear_cache = function() {
 	localStorage && localStorage.clear();
 	$c('webnotes.session_cache.clear',{},function(r,rt){ 
 		if(!r.exc) {
-			show_alert(r.message);
 			location.reload();
 		}
 	});

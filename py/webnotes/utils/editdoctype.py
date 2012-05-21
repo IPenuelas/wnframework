@@ -24,7 +24,7 @@ import conf
 from webnotes.modules.export_module import export_to_files
 from termcolor import colored
 
-sys.path.append(conf.modules_path)
+sys.path.append(webnotes.modules_path())
 
 def update_field_property(f, property):
 	import webnotes

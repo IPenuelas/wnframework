@@ -116,7 +116,7 @@ wn.get_cookie = function(c) {
 	var cookies = {};
 	for(var i=0;i<clist.length;i++) {
 		var tmp = clist[i].split('=');
-		cookies[strip(tmp[0])] = strip(tmp[1]);
+		cookies[$.trim(tmp[0])] = $.trim(tmp[1]);
 	}
 	return cookies[c];
 }

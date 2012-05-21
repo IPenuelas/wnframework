@@ -151,9 +151,9 @@ def setup_options():
 def run():
 	sys.path.append('.')
 	sys.path.append('lib/py')
+	sys.path.append('modules')
 	import webnotes
 	import conf
-	sys.path.append(conf.modules_path)
 
 	(options, args) = setup_options()
 

@@ -135,7 +135,7 @@ wn.ui.Dialog = function(opts) {
 	
 	this.set_postion = function() {
 		// place it at the center
-		this.wrapper.style.left  = (($(window).width() - cint(this.wrapper.style.width))/2) + 'px';
+		this.wrapper.style.left  = (($(window).width() - parseInt(this.wrapper.style.width))/2) + 'px';
         this.wrapper.style.top = ($(window).scrollTop() + 60) + 'px';
 
 		// place it on top
@@ -152,7 +152,7 @@ wn.ui.Dialog = function(opts) {
 		this.set_postion()
 
 		// show it
-		$ds(this.wrapper);
+		$(this.wrapper).toggle(true);
 
 		// hide background
 		freeze();
@@ -170,7 +170,7 @@ wn.ui.Dialog = function(opts) {
 
 		// hide
 		unfreeze();
-		$dh(this.wrapper);
+		$(this.wrapper).toggle(false);
 
 		// flags
 		this.display = false;

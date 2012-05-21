@@ -253,7 +253,7 @@ wn.ui.Filter = Class.extend({
 		}
 		
 		return [me.fieldselect.$select.find('option:selected').attr('table'), 
-			me.field.docfield.fieldname, me.$w.find('.condition').val(), cstr(val)];
+			me.field.docfield.fieldname, me.$w.find('.condition').val(), val+''];
 	}
 
 });
@@ -267,7 +267,7 @@ wn.ui.FieldSelect = Class.extend({
 		this.$select = $('<select>').appendTo(parent);
 		if(filter_fields) {
 			for(var i in filter_fields)
-				this.add_field_option(this.filter_fields[i])			
+				this.add_field_option(this.filter_fields[i])
 		} else {
 			this.build_options();
 		}
@@ -291,16 +291,18 @@ wn.ui.FieldSelect = Class.extend({
 		}
 
 		// main table
-		$.each(std_filters.concat(wn.meta.docfield_list[me.doctype]), function(i, df) {
-			me.add_field_option(df);
-		});
+		$.each(std_filters.concat(wn.model.get('DocType', me.doctype).get({doctype:'DocField'})), 
+			function(i, df) {
+				me.add_field_option(df);
+			});
 
 		// child tables
 		$.each(me.table_fields, function(i,table_df) {
 			if(table_df.options) {
-				$.each(wn.meta.docfield_list[table_df.options], function(i, df) {
+				$.each(wn.model.get('DocType', table_df.options).get({doctype:'DocField'}), 
+				function(i, df) {
 					me.add_field_option(df);
-				});				
+				});
 			}
 		});
 	},
@@ -315,7 +317,7 @@ wn.ui.FieldSelect = Class.extend({
 			var label = df.label + ' (' + df.parent + ')';
 			var table = df.parent;
 		}
-		if(wn.model.no_value_type.indexOf(df.fieldtype)==-1 && 
+		if(!_.contains(wn.model.no_value_type, df.fieldtype) && 
 			!me.fields_by_name[df.fieldname]) {
 			this.$select.append($('<option>', {
 				value: df.fieldname,

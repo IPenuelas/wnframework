@@ -23,8 +23,7 @@ def sync_core_doctypes(force=0):
 	return walk_and_sync(os.path.abspath(os.path.dirname(core.__file__)), force)
 
 def sync_modules(force=0):
-	import conf
-	return walk_and_sync(conf.modules_path, force)
+	return walk_and_sync(webnotes.modules_path(), force)
 
 def walk_and_sync(start_path, force=0):
 	"""walk and sync all doctypes and pages"""

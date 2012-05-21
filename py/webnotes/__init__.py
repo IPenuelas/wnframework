@@ -105,9 +105,15 @@ def is_apache_user():
 		return (not os.environ.get('USER'))
 		# os.environ does not have user, so allows a security vulnerability,fixed now. 
 
-def get_index_path():
+def root_path():
+	"""path of app root"""
 	import os
-	return os.sep.join(os.path.dirname(os.path.abspath(__file__)).split(os.sep)[:-2])
+	return os.path.join(os.sep, *os.path.abspath(os.path.dirname(__file__)).split(os.sep)[:-3])
+
+def modules_path():
+	"""path of modules"""
+	import os
+	return os.path.join(root_path(), 'modules')
 
 def get_files_path():
 	import conf

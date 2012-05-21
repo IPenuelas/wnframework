@@ -22,4 +22,4 @@ wn.ui.msgprint = function(message) {
 	d.show();
 }
 
-var msgprint = wn.ui.msgprint();
+var msgprint = wn.ui.msgprint;

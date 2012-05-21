@@ -93,8 +93,8 @@ def execute_patch(patchmodule, method=None, methodargs=None):
 
 def add_to_patch_log(tb):
 	"""add error log to patches/patch.log"""
-	import conf, os
-	with open(os.path.join(conf.modules_path,'erpnext','patches','patch.log'),'a') as patchlog:
+	import webnotes
+	with open(os.path.join(webnotes.modules_path(),'patches','patch.log'),'a') as patchlog:
 		patchlog.write('\n\n' + tb)
 	
 def update_patch_log(patchmodule):

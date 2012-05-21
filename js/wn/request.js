@@ -63,10 +63,10 @@ wn.request.cleanup = function(opts, r) {
 	}
 	
 	// show messages
-	if(r.server_messages) msgprint(r.server_messages)
+	if(r.server_messages) $.each(r.server_messages, function(i, v) { msgprint(v); });
 	
 	// show errors
-	if(r.exc) { console.log(r.exc); };
+	if(r.exc) $.each(r.exc, function(i, v) { console.log(v); });
 	
 	// 403
 	if(r['403']) {
@@ -87,7 +87,7 @@ wn.request.call = function(opts) {
 		},
 		error: function(xhr, textStatus) {
 			wn.request.cleanup(opts, {});
-			show_alert('Unable to complete request: ' + textStatus)
+			msgprint('Unable to complete request: ' + textStatus)
 			if(opts.error)opts.error(xhr)
 		}
 	})

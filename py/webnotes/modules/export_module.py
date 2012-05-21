@@ -36,7 +36,7 @@ def export_to_files(record_list=[], record_module=None, verbose=0):
 			doclist = [d.fields for d in webnotes.model.doc.get(record[0], record[1])]
 			write_document_file(doclist, record_module)
 
-def create_init_py(modules_path, dt, dn):
+def create_init_py(module_path, dt, dn):
 	"""
 		Creates __init__.py in the module directory structure
 	"""
@@ -47,9 +47,9 @@ def create_init_py(modules_path, dt, dn):
 		if not os.path.exists(initpy):
 			open(initpy, 'w').close()
 	
-	create_if_not_exists(os.path.join(modules_path))
-	create_if_not_exists(os.path.join(modules_path, dt))
-	create_if_not_exists(os.path.join(modules_path, dt, dn))
+	create_if_not_exists(os.path.join(module_path))
+	create_if_not_exists(os.path.join(module_path, dt))
+	create_if_not_exists(os.path.join(module_path, dt, dn))
 	
 def create_folder(module, dt, dn):
 	"""
@@ -58,18 +58,18 @@ def create_folder(module, dt, dn):
 	import webnotes, os
 	
 	# get module path by importing the module
-	modules_path = get_module_path(module)
+	module_path = get_module_path(module)
 			
 	code_type = dt in ['DocType', 'Page', 'Search Criteria']
 	
 	# create folder
-	folder = os.path.join(modules_path, code_type and scrub(dt) or dt, code_type and scrub(dn) or dn)
+	folder = os.path.join(module_path, code_type and scrub(dt) or dt, code_type and scrub(dn) or dn)
 	
 	webnotes.create_folder(folder)
 	
 	# create init_py_files
 	if code_type:
-		create_init_py(modules_path, scrub(dt), scrub(dn))
+		create_init_py(module_path, scrub(dt), scrub(dn))
 	
 	return folder
 
