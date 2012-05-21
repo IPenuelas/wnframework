@@ -2,10 +2,10 @@
 wn.upload = {
 	make: function(opts) {
 		var id = wn.dom.set_unique_id();
-		$(opts.parent).append(repl('<iframe id="%(id)s" name="%(id)s" src="blank.html" \
+		$(opts.parent).append(_.template('<iframe id="<%=id%>" name="<%=id%>" src="blank.html" \
 				style="width:0px; height:0px; border:0px"></iframe>\
 			<form method="POST" enctype="multipart/form-data" \
-				action="%(action)s" target="%(id)s">\
+				action="<%=action%>" target="<%=id%>">\
 				<input type="file" name="filedata" /><br><br>\
 				<input type="submit" class="btn btn-small" value="Upload" />\
 			</form>', {

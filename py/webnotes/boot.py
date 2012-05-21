@@ -105,12 +105,12 @@ def add_home_page(bootinfo, doclist):
 	import webnotes.widgets.page
 	import webnotes.cms
 
-	home_page = webnotes.cms.get_home_page(webnotes.session['user']) or 'Login Page'
+	home_page = webnotes.cms.get_home_page(webnotes.session['user']) or 'login'
 
 	try:
 		page_doclist = webnotes.widgets.page.get(home_page)
 	except webnotes.PermissionError, e:
-		page_doclist = webnotes.widgets.page.get('Login Page')
+		page_doclist = webnotes.widgets.page.get('login')
 		
 	bootinfo['home_page_html'] = page_doclist[0].content
 	bootinfo['home_page'] = page_doclist[0].name

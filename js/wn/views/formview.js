@@ -15,7 +15,7 @@ wn.views.formview = {
 				}
 
 				var page_name = wn.get_route_str();
-				if(wn.pages[page_name]) {
+				if(wn.contents[page_name]) {
 					wn.container.change_to(page_name);
 				} else {
 					new wn.views.FormView(dt, dn);					

@@ -26,8 +26,8 @@ wn.ui.AppFrame = Class.extend({
 		if(icon) {
 			args.icon = '<i class="'+icon+'"></i>';
 		}
-		this.buttons[label] = $(repl('<button class="btn btn-small">\
-			%(icon)s %(label)s</button>', args))
+		this.buttons[label] = $(_.template('<button class="btn btn-small">\
+			<%=icon%> <%=label%></button>', args))
 			.click(click)
 			.appendTo(this.$w.find('.appframe-toolbar'));
 		return this.buttons[label];

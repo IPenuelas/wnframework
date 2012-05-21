@@ -263,9 +263,9 @@ class _DocType:
 		from webnotes.modules import scrub, get_module_path
 		import conf
 		
-		modules_path = get_module_path(doc.module)
+		module_path = get_module_path(doc.module)
 
-		path = os.path.join(modules_path, 'doctype', scrub(doc.name))
+		path = os.path.join(module_path, 'doctype', scrub(doc.name))
 
 		def _add_code(fname, fieldname):
 			fpath = os.path.join(path, fname)

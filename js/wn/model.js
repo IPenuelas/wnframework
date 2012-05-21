@@ -202,8 +202,16 @@ wn.model.DocList = Class.extend({
 				docs: this.doclist
 			},
 			callback: function(r) {
-				wn.remove()
+				// reset the doclist
+				delete this.doclist;
+				this.doclist = r.docs;
+				if(this.doclist[0].get('name')!=this.name) {
+					this.rename();
+				}
 			}
 		});
+	},
+	rename: function() {
+		this.name = this.doclist[0].get('name');
 	}
 });

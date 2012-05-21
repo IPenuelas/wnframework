@@ -85,6 +85,23 @@ To subclass, use:
 			// All construction is actually done in the init method
 			if ( !initializing && this.init )
 				this.init.apply(this, arguments);
+				
+			// add bindable events
+			this._observers = {};
+			this.on = function(event_name, handle) {
+				if(!this._observers[event_name]) {
+					this._observers[event_name] = [];
+				}
+				_.get_or_set(this._observers, event_name, []).push(handle);
+			}
+			this.trigger = function(event_name) {
+				var args = [];
+				if(arguments.lengths > 1) args = arguments.splice(1);
+				var observer_list = this._observers[event_name] || [];
+				for(var i=0;i< observer_list.length; i++) {
+					observer_list[i].apply(this, args);
+				}
+			}
 		}
 		
 		// Populate our constructed prototype object

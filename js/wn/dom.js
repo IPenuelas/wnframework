@@ -93,21 +93,21 @@ wn.dom = {
 			col2: getcol(),
 			letter: letter.substr(0,1).toUpperCase()
 		}
-		return repl('<div style="\
-			height: %(height)s; \
-			width: %(width)s; \
-			font-size: %(font-size)s; \
+		return _.template('<div style="\
+			height: <%=height%>; \
+			width: <%=width%>; \
+			font-size: <%=font-size%>; \
 			color: #fff; \
 			text-align: center; \
-			padding: %(padding)s; \
-			background: -moz-linear-gradient(top,  #%(col1)s 0%, #%(col2)s 99%); /* FF3.6+ */\
-			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#%(col1)s), color-stop(99%,#%(col2)s)); /* Chrome,Safari4+ */\
-			background: -webkit-linear-gradient(top,  #%(col1)s 0%,#%(col2)s 99%); /* Chrome10+,Safari5.1+ */\
-			background: -o-linear-gradient(top,  #%(col1)s 0%,#%(col2)s 99%); /* Opera 11.10+ */\
-			background: -ms-linear-gradient(top,  #%(col1)s 0%,#%(col2)s 99%); /* IE10+ */\
-			background: linear-gradient(top,  #%(col1)s 0%,#%(col2)s 99%); /* W3C */\
-			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=\'#%(col1)s\', endColorstr=\'#%(col2)s\',GradientType=0 ); /* IE6-9 */\
-			">%(letter)s</div>', args);
+			padding: <%=padding%>; \
+			background: -moz-linear-gradient(top,  #<%=col1%> 0%, #<%=col2%> 99%); /* FF3.6+ */\
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#<%=col1%>), color-stop(99%,#<%=col2%>)); /* Chrome,Safari4+ */\
+			background: -webkit-linear-gradient(top,  #<%=col1%> 0%,#<%=col2%> 99%); /* Chrome10+,Safari5.1+ */\
+			background: -o-linear-gradient(top,  #<%=col1%> 0%,#<%=col2%> 99%); /* Opera 11.10+ */\
+			background: -ms-linear-gradient(top,  #<%=col1%> 0%,#<%=col2%> 99%); /* IE10+ */\
+			background: linear-gradient(top,  #<%=col1%> 0%,#<%=col2%> 99%); /* W3C */\
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=\'#<%=col1%>\', endColorstr=\'#<%=col2%>\',GradientType=0 ); /* IE6-9 */\
+			"><%=letter%></div>', args);
 	}
 }
 
@@ -127,36 +127,3 @@ wn.dom.set_box_shadow = function(ele, spread) {
 	$(ele).css('-box-shadow', '0px 0px '+ spread +'px rgba(0,0,0,0.3);')
 	
 };
-
-// add <option> list to <select>
-(function($) {
-	$.fn.add_options = function(options_list) {
-		// create options
-		for(var i=0; i<options_list.length; i++) {
-			var v = options_list[i];
-			value = v.value || v;
-			label = v.label || v;
-			$('<option>').html(label).attr('value', value).appendTo(this);
-		}
-		// select the first option
-		$(this).val(options_list[0].value || options_list[0]);
-	}
-	$.fn.set_working = function() {
-		var ele = this.get(0);
-		$(ele).attr('disabled', 'disabled');
-		if(ele.loading_img) { 
-			$(ele.loading_img).toggle(true);
-		} else {
-			ele.loading_img = $('<img src="images/lib/ui/button-load.gif" \
-				style="margin-left: 4px; margin-bottom: -2px; display: inline;" />')
-				.insertAfter(ele);
-		}		
-	}
-	$.fn.done_working = function() {
-		var ele = this.get(0);
-		$(ele).attr('disabled', null);
-		if(ele.loading_img) { 
-			$(ele.loading_img).toggle(false); 
-		};
-	}
-})(jQuery);

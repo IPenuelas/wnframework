@@ -46,9 +46,9 @@ wn.ui.toolbar.RecentDocs = Class.extend({
 		if(this.istable(dt)) return;
 		
 		this.remove(dt, dn);
-		var html = repl('<li data-docref="%(dt)s/%(dn)s">\
-			<a href="#Form/%(dt)s/%(dn)s">\
-				%(dn)s <span style="font-size: 10px">(%(dt)s)</span>\
+		var html = _.template('<li data-docref="<%=dt%>/<%=dn%>">\
+			<a href="#Form/<%=dt%>/<%=dn%>">\
+				<%=dn%> <span style="font-size: 10px">(<%=dt%>)</span>\
 			</a></li>', 
 			{dt:dt, dn:dn});
 		if(on_top) {
@@ -61,7 +61,7 @@ wn.ui.toolbar.RecentDocs = Class.extend({
 		return wn.model.get_value('DocType', dt, 'istable');
 	},
 	remove: function(dt, dn) {
-		$(repl('#toolbar-recent li[data-docref="%(dt)s/%(dn)s"]', {dt:dt, dn:dn})).remove();
+		$(_.template('#toolbar-recent li[data-docref="<%=dt%>/<%=dn%>"]', {dt:dt, dn:dn})).remove();
 	},
 	setup: function() {
 		// add menu items

@@ -22,14 +22,14 @@
 
 // opts { width, height, title, fields (like docfields) }
 
-wn.widgets.FieldGroup = function() {
+wn.ui.FieldGroup = function() {
 	this.first_button = false;
-	this.make_fields = function(body, fl) {		
-		$y(this.body, {padding:'11px'});
+	this.make_fields = function(body, fl) {	
+		$(this.body).css('padding', '11px');
 		this.fields_dict = {}; // reset
 		for(var i=0; i<fl.length; i++) {
 			var df = fl[i];
-			var div = $a(body, 'div', '', {margin:'6px 0px'});
+			var div = $('<div style="margin: 6px 0px">').appendTo(body);
 			
 			f = wn.ui.make_control({
 				docfield: df,
@@ -94,7 +94,7 @@ wn.widgets.FieldGroup = function() {
 	}
 }
 
-wn.widgets.Dialog = function(opts) {
+wn.ui.Dialog = function(opts) {
 	
 	this.opts = opts;
 	this.display = false;
@@ -114,7 +114,8 @@ wn.widgets.Dialog = function(opts) {
 			this.wrapper.style.width = this.opts.width + 'px';
 
 		this.make_head();
-		this.body = $a(this.wrapper, 'div', 'dialog_body');	
+		this.body = $('<div class="dialog_body">').appendTo(this.wrapper).get(0);
+		
 		if(this.opts.fields)
 			this.make_fields(this.body, this.opts.fields);
 	}
@@ -139,7 +140,7 @@ wn.widgets.Dialog = function(opts) {
 
 		// place it on top
 		top_index++;
-		$y(this.wrapper,{zIndex:top_index});		
+		$(this.wrapper).css('z-index', top_index);	
 	}
 	
 	/** show the dialog */
@@ -157,7 +158,7 @@ wn.widgets.Dialog = function(opts) {
 		freeze();
 
 		this.display = true;
-		cur_dialog = this;
+		wn.ui.cur_dialog = this;
 
 		// call onshow
 		if(this.onshow)this.onshow();
@@ -173,7 +174,7 @@ wn.widgets.Dialog = function(opts) {
 
 		// flags
 		this.display = false;
-		cur_dialog = null;
+		wn.ui.cur_dialog = null;
 	}
 		
 	this.no_cancel = function() {
@@ -184,14 +185,12 @@ wn.widgets.Dialog = function(opts) {
 
 }
 
-wn.widgets.Dialog.prototype = new wn.widgets.FieldGroup();
-
-wn.provide('wn.ui');
-wn.ui.Dialog = wn.widgets.Dialog
+wn.ui.Dialog.prototype = new wn.ui.FieldGroup();
+wn.ui.cur_dialog = null;
 
 // close open dialogs on ESC
 $(document).bind('keydown', function(e) {
-	if(cur_dialog && !cur_dialog.no_cancel_flag && e.which==27) {
-		cur_dialog.hide();
+	if(wn.ui.cur_dialog && !wn.ui.cur_dialog.no_cancel_flag && e.which==27) {
+		wn.ui.cur_dialog.hide();
 	}
 });

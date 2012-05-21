@@ -15,7 +15,7 @@
 		'doctype': 'Page',
 		'module': u'Core',
 		'name': '__common__',
-		'page_name': u'Login Page',
+		'page_name': u'login',
 		'standard': u'Yes',
 		'web_page': u'Yes'
 	},
@@ -23,6 +23,7 @@
 	# Page, Login Page
 	{
 		'doctype': 'Page',
-		'name': u'Login Page'
+		'name': u'login',
+		'title': 'Login'
 	}
 ]

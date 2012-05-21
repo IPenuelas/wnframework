@@ -13,7 +13,7 @@ wn.route = function() {
 
 	var page_name = wn.get_route_str();
 	
-	if(wn.pages[page_name]) {  // loaded
+	if(wn.contents[page_name]) {  // loaded
 		wn.container.change_to(page_name);
 		return;	
 	}

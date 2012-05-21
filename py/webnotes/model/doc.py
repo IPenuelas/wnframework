@@ -653,7 +653,7 @@ def getchildren(name, childtype, field='', parenttype='', from_doctype=0, prefix
 # ---------------------------------------------
 
 def check_page_perm(doc):
-	if doc.name=='Login Page':
+	if doc.name=='login':
 		return
 	if doc.publish:
 		return

@@ -20,55 +20,50 @@
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 
-pscript['onload_Login Page'] = function(wrapper){
+wn.provide('wn.login')
+
+wn.pages.login.on('load', function() {
+	var wrapper = this.wrapper;
 	wrapper.appframe = new wn.ui.AppFrame($(wrapper).find('.appframe-area'));
 	wrapper.appframe.title('Login');
 	wrapper.appframe.$w.find('.close').toggle(false);
 
-	var lw = $i('login_wrapper');
-	$bs(lw, '1px 1px 3px #888');
-
-	$('#login_btn').click(pscript.doLogin)
+	$('#login_btn').click(wn.login.do)
 		
 	$('#password').keypress(function(ev){
 		if(ev.which==13 && $('#password').val())
-			pscript.doLogin();
+			wn.login.do();
 	});
-	$(document).trigger('login_rendered');
-}
-
-pscript['onshow_Login Page'] = function() {
-	// set banner
-}
-
-// Login Callback
-pscript.onLoginReply = function(r, rtext) {
-	$('#login_btn').done_working();
-    if(r.message=="Logged In"){
-        window.location.href='app.html' + (get_url_arg('page') ? ('?page='+get_url_arg('page')) : '');
-    } else {
-        $i('login_message').innerHTML = '<span style="color: RED;">'+(r.message)+'</span>';
-        //if(r.exc)alert(r.exc);
-    }
-}
-
+	$(document).trigger('login_rendered');	
+});
 
 // Login
-pscript.doLogin = function(){
+wn.login.do = function(){
 
     var args = {};
-    args['usr']=$i("login_id").value;
-    args['pwd']=$i("password").value;
-    if($i('remember_me').checked) 
+    args['usr']=$("#login_id").val();
+    args['pwd']=$("#password").val();
+    if($('#remember_me').attr("checked")) 
       args['remember_me'] = 1;
 
 	$('#login_btn').set_working();
-	
-    $c("login", args, pscript.onLoginReply);
+
+	wn.call({
+		method: 'login',
+		args: args,
+		callback: function(r) {
+			$('#login_btn').done_working();
+		    if(r.message=="Logged In"){
+		        window.location.href='app.html';
+		    } else {
+		        $('#login_message').html('<span style="color: RED;">'+(r.message)+'</span>');
+		    }			
+		}
+	})
 }
 
 
-wn.show_forgot_password = function(){
+wn.login.show_forgot_password = function(){
     // create dialog
 	var d = new wn.ui.Dialog({
 		title:"Forgot Password",

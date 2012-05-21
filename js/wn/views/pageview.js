@@ -1,4 +1,5 @@
 wn.provide('wn.views.pageview');
+wn.provide('wn.pages');
 
 wn.views.pageview = {
 	with_page: function(name, callback) {
@@ -31,12 +32,16 @@ wn.views.Page = Class.extend({
 		this.name = name;
 		var me = this;
 
+		wn.pages[name] = this;
+
 		// web home page
 		if(name==window.page_name) {
 			this.wrapper = document.getElementById('page-' + name);
 			this.wrapper.label = document.title || window.page_name;
 			this.wrapper.page_name = window.page_name;
-			wn.pages[window.page_name] = this.wrapper;
+			wn.contents[window.page_name] = this.wrapper;
+			
+			// onload called in script
 		} else {
 			this.pagedoc = wn.model.get('Page', this.name);
 			this.wrapper = wn.container.add_page(this.name);
@@ -47,28 +52,16 @@ wn.views.Page = Class.extend({
 			this.wrapper.innerHTML = this.pagedoc.get('content');
 			wn.dom.eval(this.pagedoc.get('script', ''));
 			wn.dom.set_style(this.pagedoc.get('style', ''));
-		}
 
-		this.trigger('onload');
+			this.trigger('load');
+		}
 		
 		// set events
 		$(this.wrapper).bind('show', function() {
 			cur_frm = null;
-			me.trigger('onshow');
+			me.trigger('show');
 			me.trigger('refresh');
 		});
-	},
-	trigger: function(eventname) {
-		var me = this;
-		try {
-			if(pscript[eventname+'_'+this.name]) {
-				pscript[eventname+'_'+this.name](me.wrapper);				
-			} else if(me.wrapper[eventname]) {
-				me.wrapper[eventname](me.wrapper);
-			}
-		} catch(e) { 
-			console.log(e); 
-		}
 	}
 })
 

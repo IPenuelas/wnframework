@@ -12,12 +12,12 @@ wn.views.breadcrumbs = function(parent, module, doctype, name) {
 	}
 
 	if(name && doctype && (!wn.model.get_value('DocType', doctype, 'issingle'))) {
-		$bspan.append(repl(' in <a href="#!List/%(doctype)s">%(doctype)s List</a>',
+		$bspan.append(_.template(' in <a href="#!List/<%=doctype%>"><%=doctype%> List</a>',
 			{doctype: doctype}))
-	}
+	};
 	
 	if(doctype && module && wn.modules && wn.modules[module]) {
-		$bspan.append(repl(' in <a href="#!%(module_page)s">%(module)s</a>',
+		$bspan.append(_.template(' in <a href="#!<%=module_page%>"><%=module%></a>',
 			{module: module, module_page: wn.modules[module] }))
 	}
 	$bspan.appendTo(parent);

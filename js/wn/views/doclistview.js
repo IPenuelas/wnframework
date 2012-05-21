@@ -52,10 +52,10 @@ wn.views.DocListView = wn.ui.Listing.extend({
 		wn.container.change_to(page_name);
 		this.$page = $(page);
 		
-		this.$page.html(repl('<div class="layout-wrapper layout-wrapper-background">\
+		this.$page.html(_.template('<div class="layout-wrapper layout-wrapper-background">\
 			<div class="appframe-area"></div>\
 			<div class="layout-main-section">\
-				<!--<h1>%(label)s</h1>\
+				<!--<h1><%=label%></h1>\
 				<hr>-->\
 				<div class="wnlist-area"><div class="help">Loading...</div></div>\
 			</div>\
@@ -133,12 +133,12 @@ wn.views.DocListView = wn.ui.Listing.extend({
 		this.run();
 	},
 	make_no_result: function() {
-		return repl('<div class="well"><p>No %(doctype_label)s found</p>\
-		%(description)s\
+		return _.template('<div class="well"><p>No <%=doctype_label%> found</p>\
+		<%=description%>\
 		<hr>\
 		<p><button class="btn btn-info btn-small"\
-				onclick="newdoc(\'%(doctype)s\');"\
-				>Make a new %(doctype_label)s</button>\
+				onclick="newdoc(\'<%=doctype%>\');"\
+				>Make a new <%=doctype_label%></button>\
 		</p></div>', {
 			doctype_label: this.doctype,
 			doctype: this.doctype,
@@ -258,12 +258,12 @@ wn.views.DocListView = wn.ui.Listing.extend({
 		args.count = v[1];
 		args.field = field;
 		
-		$item = $(repl('<div class="stat-item">\
-			<div class="stat-bar" style="width: %(width)s%"></div>\
+		$item = $(_.template('<div class="stat-item">\
+			<div class="stat-bar" style="width: <%=width%>"></div>\
 			<div class="stat-label">\
-				<a href="#" data-label="%(label)s" data-field="%(field)s">\
-					%(label)s</a> \
-				(%(count)s)</div>\
+				<a href="#" data-label="<%=label%>" data-field="<%=field%>">\
+					<%=label%></a> \
+				(<%=count%>)</div>\
 		</div>', args));
 		
 		this.setup_stat_item_click($item);
@@ -349,11 +349,11 @@ wn.views.ListView = Class.extend({
 			opts.content(parent, data);
 		}
 		else if(opts.content=='name') {
-			$(parent).append(repl('<a href="#!Form/%(doctype)s/%(name)s">%(name)s</a>', data));
+			$(parent).append(_.template('<a href="#!Form/<%=doctype%>/<%=name%>"><%=name%></a>', data));
 		} 
 		else if(opts.content=='avatar') {
-			$(parent).append(repl('<span class="avatar-small"><img src="%(avatar)s" \
-				title="%(fullname)s"/></span>', 
+			$(parent).append(_.template('<span class="avatar-small"><img src="<%=avatar%>" \
+				title="<%=fullname%>"/></span>', 
 				data));			
 		}
 		else if(opts.content=='check') {
@@ -361,8 +361,8 @@ wn.views.ListView = Class.extend({
 			$(parent).find('input').data('name', data.name);			
 		}
 		else if(opts.content=='docstatus') {
-			$(parent).append(repl('<span class="docstatus"><i class="%(docstatus_icon)s" \
-				title="%(docstatus_title)s"></i></span>', data));			
+			$(parent).append(_.template('<span class="docstatus"><i class="<%=docstatus_icon%>" \
+				title="<%=docstatus_title%>"></i></span>', data));			
 		}
 		else if(opts.content=='tags') {
 			this.add_user_tags(parent, data);
@@ -376,18 +376,18 @@ wn.views.ListView = Class.extend({
 				fully_delivered: (data[opts.content] > 99 ? 'bar-complete' : ''),
 				label: opts.label
 			}
-			$(parent).append(repl('<span class="bar-outer" style="width: 30px; float: right" \
-				title="%(percent)s% %(label)s">\
-				<span class="bar-inner %(fully_delivered)s" \
-					style="width: %(percent)s%;"></span>\
+			$(parent).append(_.template('<span class="bar-outer" style="width: 30px; float: right" \
+				title="<%=percent%>% <%=label%>">\
+				<span class="bar-inner <%=fully_delivered%>" \
+					style="width: <%=percent%>%;"></span>\
 			</span>', args));
 		}
 		else if(opts.type=='link' && opts.doctype) {
-			$(parent).append(repl('<a href="#!Form/'+opts.doctype+'/'
+			$(parent).append(_.template('<a href="#!Form/'+opts.doctype+'/'
 				+data[opts.content]+'">'+data[opts.content]+'</a>', data));
 		}
 		else if(opts.template) {
-			$(parent).append(repl(opts.template, data));
+			$(parent).append(_.template(opts.template, data));
 		}
 		else if(data[opts.content]) {
 			$(parent).append(' ' + data[opts.content]);
@@ -401,7 +401,7 @@ wn.views.ListView = Class.extend({
 				
 		// make table
 		$.each(this.columns, function(i, v) {
-			rowhtml += repl('<td style="width: %(width)s"></td>', v);
+			rowhtml += _.template('<td style="width: <%=width%>"></td>', v);
 		});
 		var tr = $(row).html('<table><tbody><tr>' + rowhtml + '</tr></tbody></table>').find('tr').get(0);
 		

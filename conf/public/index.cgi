@@ -32,7 +32,7 @@ sys.path.append('..')
 import conf
 
 sys.path.append('../lib/py')
-sys.path.append(conf.modules_path)
+sys.path.append('../modules')
 
 import webnotes
 import webnotes.handler

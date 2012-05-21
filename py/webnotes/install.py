@@ -79,6 +79,8 @@ class Installer:
 		self.dbman.restore_database(target, source_path, self.root_password)
 		if verbose: print "Imported from database %s" % source_path
 
+		self.create_cache_item()
+
 		# fresh app
 		if 'Framework.sql' in source_path:
 			from webnotes.model.sync import sync_install
@@ -97,7 +99,6 @@ class Installer:
 		self.create_sessions_table()
 		self.create_scheduler_log()
 		self.create_session_cache()
-		self.create_cache_item()
 
 		# set the basic passwords
 		webnotes.conn.begin()
@@ -145,5 +146,36 @@ class Installer:
 			`expires_on` TIMESTAMP
 			)""")
 			
-
+def setup_folders():
+	import os, shutil
+	if not os.path.exists('modules'):
+		os.makedirs('modules')
+	if not os.path.exists('public/css'):
+		os.makedirs('public/css')
+	if not os.path.exists('public/js'):
+		os.makedirs('public/js')
+	if not os.path.exists('public/files'):
+		os.makedirs('public/files')
+	if not os.path.exists('public/backups'):
+		os.makedirs('public/backups')
+	if not os.path.exists('public/images'):
+		os.makedirs('public/images')
+	
+	# symlink libs
+	if not os.path.exists('public/js/lib'):
+		os.symlink(os.path.abspath('lib/js/lib'), 'public/js/lib')
+	if not os.path.exists('public/images/lib'):
+		os.symlink(os.path.abspath('lib/images'), 'public/images/lib')
+	
+	# copy app and index
+	if not os.path.exists('public/app.html'):
+		shutil.copyfile('lib/conf/public/app.html', 'public/app.html')
+	if not os.path.exists('public/index.cgi'):
+		shutil.copyfile('lib/conf/public/index.cgi', 'public/index.cgi')
+		import stat
+		os.chmod('public/index.cgi', stat.S_IRWXU | stat.S_IRWXG | stat.S_IXOTH)
 		
+	if not os.path.exists('public/sitemap.xml'):
+		shutil.copyfile('lib/conf/public/sitemap.xml', 'public/sitemap.xml')
+	if not os.path.exists('public/unsupported.html'):
+		shutil.copyfile('lib/conf/public/unsupported.html', 'public/unsupported.html')

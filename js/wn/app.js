@@ -52,7 +52,7 @@ wn.Application = Class.extend({
 		
 		// navbar
 		this.make_nav_bar();
-			
+
 		// favicon
 		this.set_favicon();
 
@@ -63,7 +63,7 @@ wn.Application = Class.extend({
 			// route to home page
 			wn.route();	
 		}
-		
+				
 		$(document).trigger('app_ready');
 	},
 	load_bootinfo: function() {

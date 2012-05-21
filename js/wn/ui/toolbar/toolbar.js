@@ -81,13 +81,12 @@ wn.ui.toolbar.Toolbar = Class.extend({
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#" \
 				onclick="return false;">Tools<b class="caret"></b></a>\
 			<ul class="dropdown-menu" id="toolbar-tools">\
-				<li><a href="#" onclick="return err_console.show();">Error Console</a></li>\
 				<li><a href="#" onclick="return wn.ui.toolbar.clear_cache();">Clear Cache & Refresh</a></li>\
 				<li><a href="#" onclick="return wn.ui.toolbar.show_about();">About</a></li>\
 			</ul>\
 		</li>');
 		
-		if(has_common(user_roles,['Administrator','System Manager'])) {
+		if(_.intersection(user_roles,['Administrator','System Manager']).length) {
 			$('#toolbar-tools').append('<li><a href="#" \
 				onclick="return wn.ui.toolbar.download_backup();">\
 				Download Backup</a></li>');

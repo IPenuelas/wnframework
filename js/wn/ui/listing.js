@@ -81,9 +81,9 @@ wn.ui.Listing = Class.extend({
 		this.prepare_opts();
 		$.extend(this, this.opts);
 		
-		$(this.parent).html(repl('\
+		$(this.parent).html(_.template('\
 			<div class="wnlist">\
-				<h3 class="title hide">%(title)s</h3>\
+				<h3 class="title hide"><%=title%></h3>\
 				\
 				<div class="list-filters hide">\
 					<div class="show_filters well">\
@@ -104,7 +104,7 @@ wn.ui.Listing = Class.extend({
 				</div><div style="clear:both"></div>\
 				\
 				<div class="no-result help hide">\
-					%(no_result_message)s\
+					<%=no_result_message%>\
 				</div>\
 				\
 				<div class="result">\

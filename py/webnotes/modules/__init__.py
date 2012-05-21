@@ -44,11 +44,15 @@ def get_module_path(module):
 	m = scrub(module)
 	
 	if m in ('core'):
-		path_to_lib = os.sep.join(conf.modules_path.split(os.path.sep)[:-1])
-		return os.path.join(path_to_lib, 'lib', 'py', 'core')
+		if os.path.exists('public'):
+			return os.path.join('..', 'lib', 'py', 'core')
+		else:
+			return os.path.join('.', 'lib', 'py', 'core')
 	else:
-		return os.path.join(conf.modules_path, m)
-	
+		if os.path.exists('public'):
+			return os.path.join('..', 'modules', m)
+		else:
+			return os.path.join('..', 'modules', m)
 
 def reload_doc(module, dt=None, dn=None):
 	"""reload single / list of records"""

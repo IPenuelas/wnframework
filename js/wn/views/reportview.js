@@ -181,7 +181,7 @@ wn.views.ReportView = wn.ui.Listing.extend({
 						
 			if(c[0]=='name') {
 				coldef.formatter = function(row, cell, value, columnDef, dataContext) {
-					return repl("<a href='#!Form/%(doctype)s/%(name)s'>%(name)s</a>", {
+					return _.template("<a href='#!Form/<%=doctype%>/<%=name%>'><%=name%></a>", {
 						doctype: me.doctype,
 						name: value
 					});
@@ -189,7 +189,7 @@ wn.views.ReportView = wn.ui.Listing.extend({
 			} else if(docfield && docfield.fieldtype=='Link') {
 				coldef.formatter = function(row, cell, value, columnDef, dataContext) {
 					if(value) {
-						return repl("<a href='#!Form/%(doctype)s/%(name)s'>%(name)s</a>", {
+						return _.template("<a href='#!Form/<%=doctype%>/<%=name%>'><%=name%></a>", {
 							doctype: columnDef.docfield.options,
 							name: value
 						});						
