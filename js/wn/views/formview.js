@@ -50,7 +50,7 @@ wn.views.FormDialog = wn.ui.Dialog.extend({
 	init: function(opts) {
 		$.extend(this, opts);
 		_.get_or_set(this, 'width', 600);
-		_.get_or_set(this, 'title', name);
+		_.get_or_set(this, 'title', this.name);
 		
 		// init dialog
 		this._super();

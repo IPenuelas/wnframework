@@ -1,0 +1,77 @@
+[
+ {
+  "document_type": "System", 
+  "name": "System Console", 
+  "idx": 1, 
+  "module": "Core", 
+  "show_in_menu": 1, 
+  "version": 1, 
+  "doctype": "DocType", 
+  "issingle": 1
+ }, 
+ {
+  "idx": 1, 
+  "parent": "System Console", 
+  "read": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "Administrator", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "System Console", 
+  "read": 1, 
+  "doctype": "DocPerm", 
+  "parenttype": "DocType", 
+  "role": "Administrator", 
+  "permlevel": 1, 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 1, 
+  "parent": "System Console", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "script", 
+  "fieldtype": "Code", 
+  "label": "Script", 
+  "options": "Python", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "System Console", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "trigger": "Client", 
+  "fieldname": "server_python", 
+  "fieldtype": "Button", 
+  "label": "Server (Python)", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "System Console", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "trigger": "Client", 
+  "fieldname": "client_js", 
+  "fieldtype": "Button", 
+  "label": "Client (JS)", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 4, 
+  "parent": "System Console", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "response", 
+  "fieldtype": "Text", 
+  "label": "Error", 
+  "permlevel": 1, 
+  "parentfield": "fields"
+ }
+]

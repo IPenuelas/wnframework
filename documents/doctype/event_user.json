@@ -1,0 +1,22 @@
+[
+ {
+  "istable": 1, 
+  "name": "Event User", 
+  "idx": 1, 
+  "module": "Core", 
+  "autoname": "EVP.#####", 
+  "doctype": "DocType"
+ }, 
+ {
+  "parent": "Event User", 
+  "doctype": "DocField", 
+  "idx": 1, 
+  "label": "Person", 
+  "parenttype": "DocType", 
+  "options": "link:Profile", 
+  "fieldname": "person", 
+  "fieldtype": "Select", 
+  "search_index": 1, 
+  "parentfield": "fields"
+ }
+]

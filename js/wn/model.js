@@ -199,6 +199,7 @@ wn.model.DocList = Class.extend({
 	},
 	// save doclist
 	save: function(docstatus, callback) {
+		var me = this;
 		wn.call({
 			method: 'webnotes.model.doclist.save',
 			args: {
@@ -206,10 +207,10 @@ wn.model.DocList = Class.extend({
 			},
 			callback: function(r) {
 				// reset the doclist
-				delete this.doclist;
-				this.doclist = r.docs;
-				if(this.doclist[0].get('name')!=this.name) {
-					this.rename();
+				delete me.doclist;
+				me.doclist = r.docs;
+				if(me.doclist[0].get('name')!=me.name) {
+					me.rename();
 				}
 			}
 		});

@@ -1,0 +1,22 @@
+[
+ {
+  "istable": 1, 
+  "module": "Core", 
+  "doctype": "DocType", 
+  "autoname": "UR.#####", 
+  "name": "UserRole", 
+  "idx": 1
+ }, 
+ {
+  "parent": "UserRole", 
+  "doctype": "DocField", 
+  "idx": 1, 
+  "label": "Role", 
+  "width": "200px", 
+  "parenttype": "DocType", 
+  "options": "Role", 
+  "fieldname": "role", 
+  "fieldtype": "Link", 
+  "parentfield": "fields"
+ }
+]

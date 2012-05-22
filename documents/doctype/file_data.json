@@ -1,0 +1,40 @@
+[
+ {
+  "name": "File Data", 
+  "idx": 1, 
+  "module": "Core", 
+  "autoname": "FileData/.#####", 
+  "doctype": "DocType"
+ }, 
+ {
+  "idx": 1, 
+  "parent": "File Data", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "file_name", 
+  "fieldtype": "Data", 
+  "label": "File Name", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "File Data", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "Module Def", 
+  "fieldname": "module", 
+  "fieldtype": "Link", 
+  "label": "Module", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "File Data", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "blob_content", 
+  "fieldtype": "Blob", 
+  "label": "Blob Content", 
+  "parentfield": "fields"
+ }
+]

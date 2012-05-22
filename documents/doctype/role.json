@@ -1,0 +1,66 @@
+[
+ {
+  "module": "Core", 
+  "doctype": "DocType", 
+  "autoname": "field:role_name", 
+  "name": "Role", 
+  "idx": 1, 
+  "version": 1
+ }, 
+ {
+  "idx": 1, 
+  "parent": "Role", 
+  "read": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "Administrator", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "Role", 
+  "read": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "System Manager", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 1, 
+  "parent": "Role", 
+  "doctype": "DocField", 
+  "reqd": 1, 
+  "parenttype": "DocType", 
+  "options": "link:Module Def", 
+  "fieldname": "module", 
+  "fieldtype": "Select", 
+  "label": "Module", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "Role", 
+  "doctype": "DocField", 
+  "reqd": 1, 
+  "parenttype": "DocType", 
+  "fieldname": "role_name", 
+  "fieldtype": "Data", 
+  "label": "Role Name", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "Role", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "DefaultValue", 
+  "fieldname": "defaults", 
+  "fieldtype": "Table", 
+  "label": "Defaults", 
+  "parentfield": "fields"
+ }
+]

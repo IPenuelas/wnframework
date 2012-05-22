@@ -1,0 +1,12 @@
+[
+ {
+  "name": "login", 
+  "idx": 1, 
+  "title": "Login", 
+  "web_page": "Yes", 
+  "module": "Core", 
+  "doctype": "Page", 
+  "page_name": "login", 
+  "standard": "Yes"
+ }
+]

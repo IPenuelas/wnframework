@@ -1,0 +1,101 @@
+[
+ {
+  "autoname": "CWR/.#####", 
+  "module": "Core", 
+  "doctype": "DocType", 
+  "name": "Comment", 
+  "idx": 1, 
+  "version": 9
+ }, 
+ {
+  "idx": 1, 
+  "parent": "Comment", 
+  "read": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "System Manager", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 1, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "comment", 
+  "fieldtype": "Text", 
+  "label": "Comment", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "comment_by", 
+  "fieldtype": "Data", 
+  "label": "Comment By", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "comment_by_fullname", 
+  "fieldtype": "Data", 
+  "label": "Comment By Fullname", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 4, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "comment_date", 
+  "fieldtype": "Date", 
+  "label": "Comment Date", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 5, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "comment_time", 
+  "fieldtype": "Data", 
+  "label": "Comment Time", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 6, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "comment_doctype", 
+  "fieldtype": "Data", 
+  "label": "Comment Doctype", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 7, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "comment_docname", 
+  "fieldtype": "Data", 
+  "label": "Comment Docname", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 8, 
+  "parent": "Comment", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "post_topic", 
+  "fieldtype": "Data", 
+  "label": "Post Topic", 
+  "parentfield": "fields"
+ }
+]

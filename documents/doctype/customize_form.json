@@ -1,0 +1,217 @@
+[
+ {
+  "autoname": "DL.####", 
+  "search_fields": "doc_type", 
+  "module": "Core", 
+  "doctype": "DocType", 
+  "issingle": 1, 
+  "name": "Customize Form", 
+  "idx": 1, 
+  "version": 108
+ }, 
+ {
+  "idx": 1, 
+  "parent": "Customize Form", 
+  "read": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "System Manager", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "Customize Form", 
+  "read": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "System Manager", 
+  "permlevel": 1, 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "Customize Form", 
+  "read": 1, 
+  "doctype": "DocPerm", 
+  "parenttype": "DocType", 
+  "role": "System Manager", 
+  "permlevel": 2, 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 1, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "link:DocType\n(module IN  (\"Accounts\", \"Buying\", \"HR\", \"Knowledge Base\", \"Production\", \"Projects\", \"Selling\", \"Stock\", \"Support\") OR name IN (\"Contact\", \"Address\")) AND IFNULL(issingle, 0)=0 AND IFNULL(in_create, 0)=0", 
+  "fieldname": "doc_type", 
+  "fieldtype": "Select", 
+  "label": "Select Form Type", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "properties", 
+  "fieldtype": "Section Break", 
+  "label": "Properties", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "column_break0", 
+  "fieldtype": "Column Break", 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "E.g.<br />\nBased on field - <b>field:customer_name</b><br />\nBased on number series: <b>TRN.####</b>", 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "idx": 4, 
+  "parenttype": "DocType", 
+  "fieldname": "autoname", 
+  "fieldtype": "Data", 
+  "hidden": 1, 
+  "label": "Auto Name", 
+  "permlevel": 2, 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "Fields separated by comma (,) will be included in the<br /><b>Search By</b> list of Search dialog box", 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "idx": 5, 
+  "parenttype": "DocType", 
+  "fieldname": "search_fields", 
+  "fieldtype": "Data", 
+  "label": "Search Fields", 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "Fields separated by comma (,) will be set as tags", 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "idx": 6, 
+  "parenttype": "DocType", 
+  "fieldname": "tag_fields", 
+  "fieldtype": "Data", 
+  "label": "Tag Fields", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 7, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "Print Format", 
+  "fieldname": "default_print_format", 
+  "fieldtype": "Link", 
+  "label": "Default Print Format", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 8, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "column_break1", 
+  "fieldtype": "Column Break", 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "Load Print View on opening of an existing form", 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "idx": 9, 
+  "parenttype": "DocType", 
+  "fieldname": "read_only_onload", 
+  "fieldtype": "Check", 
+  "label": "Show Print First", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 10, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_print", 
+  "fieldtype": "Check", 
+  "label": "Hide Print", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 11, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_email", 
+  "fieldtype": "Check", 
+  "label": "Hide Email", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 12, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_copy", 
+  "fieldtype": "Check", 
+  "label": "Hide Copy", 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "Note: maximum attachment size = 1mb", 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "idx": 13, 
+  "parenttype": "DocType", 
+  "fieldname": "allow_attach", 
+  "fieldtype": "Check", 
+  "label": "Allow Attach", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 14, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "max_attachments", 
+  "fieldtype": "Int", 
+  "depends_on": "eval:doc.allow_attach", 
+  "label": "Max Attachments", 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "Customize Label, Print Hide, Default etc.", 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "idx": 15, 
+  "parenttype": "DocType", 
+  "fieldname": "fields_section_break", 
+  "fieldtype": "Section Break", 
+  "label": "Fields", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 16, 
+  "parent": "Customize Form", 
+  "doctype": "DocField", 
+  "default": "no add rows", 
+  "parenttype": "DocType", 
+  "options": "Customize Form Field", 
+  "fieldname": "fields", 
+  "fieldtype": "Table", 
+  "label": "Fields", 
+  "permlevel": 1, 
+  "parentfield": "fields"
+ }
+]

@@ -1,0 +1,12 @@
+[
+ {
+  "name": "data-import-tool", 
+  "idx": 1, 
+  "title": "Data Import Tool", 
+  "web_page": "No", 
+  "module": "Core", 
+  "doctype": "Page", 
+  "page_name": "Data Import Tool", 
+  "standard": "Yes"
+ }
+]

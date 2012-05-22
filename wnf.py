@@ -150,8 +150,9 @@ def setup_options():
 	
 def run():
 	sys.path.append('.')
-	sys.path.append('lib/py')
-	sys.path.append('modules')
+	sys.path.append('controllers')
+	sys.path.append('lib')
+	sys.path.append('lib/controllers')
 	import webnotes
 	import conf
 

@@ -1,0 +1,33 @@
+[
+ {
+  "istable": 1, 
+  "module": "Core", 
+  "doctype": "DocType", 
+  "autoname": "DEF.######", 
+  "name": "DefaultValue", 
+  "idx": 1
+ }, 
+ {
+  "reqd": 1, 
+  "idx": 1, 
+  "parent": "DefaultValue", 
+  "doctype": "DocField", 
+  "width": "200px", 
+  "parenttype": "DocType", 
+  "fieldname": "defkey", 
+  "fieldtype": "Data", 
+  "label": "Key", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "DefaultValue", 
+  "doctype": "DocField", 
+  "width": "200px", 
+  "parenttype": "DocType", 
+  "fieldname": "defvalue", 
+  "fieldtype": "Text", 
+  "label": "Value", 
+  "parentfield": "fields"
+ }
+]

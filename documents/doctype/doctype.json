@@ -1,0 +1,404 @@
+[
+ {
+  "search_fields": "autoname", 
+  "module": "Core", 
+  "doctype": "DocType", 
+  "print_outline": "Yes", 
+  "autoname": "Prompt", 
+  "name": "DocType", 
+  "idx": 1, 
+  "version": 13
+ }, 
+ {
+  "idx": 1, 
+  "parent": "DocType", 
+  "read": 1, 
+  "doctype": "DocPerm", 
+  "parenttype": "DocType", 
+  "role": "System Manager", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "DocType", 
+  "read": 1, 
+  "doctype": "DocPerm", 
+  "parenttype": "DocType", 
+  "role": "System Manager", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "DocType", 
+  "read": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "Administrator", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 4, 
+  "parent": "DocType", 
+  "read": 1, 
+  "doctype": "DocPerm", 
+  "parenttype": "DocType", 
+  "role": "Administrator", 
+  "permlevel": 1, 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 1, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "options", 
+  "fieldtype": "Section Break", 
+  "label": "Options", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "width": "50%", 
+  "parenttype": "DocType", 
+  "fieldname": "settings", 
+  "fieldtype": "Column Break", 
+  "label": "Settings", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "reqd": 1, 
+  "parenttype": "DocType", 
+  "options": "Module Def", 
+  "fieldname": "module", 
+  "fieldtype": "Link", 
+  "label": "Module", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 4, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "autoname", 
+  "fieldtype": "Data", 
+  "label": "Auto Name", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 5, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "\nTitle Case\nUPPER CASE", 
+  "fieldname": "name_case", 
+  "fieldtype": "Select", 
+  "label": "Name Case", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 6, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "search_fields", 
+  "fieldtype": "Data", 
+  "label": "Search Fields", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 7, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "istable", 
+  "fieldtype": "Check", 
+  "label": "Is Table", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 8, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "read_only", 
+  "fieldtype": "Check", 
+  "label": "Not In Search", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 9, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "in_create", 
+  "fieldtype": "Check", 
+  "label": "Not In Create", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 10, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "trigger": "Client", 
+  "fieldname": "issingle", 
+  "fieldtype": "Check", 
+  "label": "Is Single", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 11, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "is_submittable", 
+  "fieldtype": "Check", 
+  "label": "Is Submittable", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 12, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "read_only_onload", 
+  "fieldtype": "Check", 
+  "label": "Show Print First", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 13, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "\nMaster\nTransaction\nSystem\nOther", 
+  "fieldname": "document_type", 
+  "fieldtype": "Select", 
+  "label": "Document Type", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 14, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "width": "50%", 
+  "parenttype": "DocType", 
+  "fieldname": "display", 
+  "fieldtype": "Column Break", 
+  "label": "Display", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 15, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "is_transaction_doc", 
+  "fieldtype": "Check", 
+  "label": "Is Transaction Doc", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 16, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_print", 
+  "fieldtype": "Check", 
+  "label": "Hide Print", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 17, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_email", 
+  "fieldtype": "Check", 
+  "label": "Hide Email", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 18, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "in_dialog", 
+  "fieldtype": "Check", 
+  "label": "In Dialog", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 19, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_copy", 
+  "fieldtype": "Check", 
+  "label": "Hide Copy", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 20, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "hide_toolbar", 
+  "fieldtype": "Check", 
+  "label": "Hide Toolbar", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 21, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "hide_heading", 
+  "fieldtype": "Check", 
+  "label": "Hide Heading", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 22, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "trigger": "Client", 
+  "fieldname": "allow_attach", 
+  "fieldtype": "Check", 
+  "label": "Allow Attach", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 23, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "max_attachments", 
+  "fieldtype": "Int", 
+  "hidden": 1, 
+  "label": "Max Attachments", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 24, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_rename", 
+  "fieldtype": "Check", 
+  "label": "Allow Rename", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 25, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "default_print_format", 
+  "fieldtype": "Data", 
+  "label": "Default Print Format", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 26, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "permissions_section_break", 
+  "fieldtype": "Section Break", 
+  "label": "Permissions", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 27, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "width": "70%", 
+  "parenttype": "DocType", 
+  "fieldname": "roles_and_permissions", 
+  "fieldtype": "Column Break", 
+  "label": "Roles and Permissions", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 28, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "DocPerm", 
+  "fieldname": "permissions", 
+  "fieldtype": "Table", 
+  "label": "Permissions", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 29, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "allow_trash", 
+  "fieldtype": "Check", 
+  "label": "Allow Trash", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 30, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "fields_section_break", 
+  "fieldtype": "Section Break", 
+  "label": "Fields", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 31, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "document_fields", 
+  "fieldtype": "Column Break", 
+  "label": "Document Fields", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 32, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "DocField", 
+  "fieldname": "fields", 
+  "fieldtype": "Table", 
+  "label": "Fields", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 33, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "description_section_break", 
+  "fieldtype": "Section Break", 
+  "label": "Description", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 34, 
+  "parent": "DocType", 
+  "doctype": "DocField", 
+  "width": "300px", 
+  "parenttype": "DocType", 
+  "fieldname": "description", 
+  "fieldtype": "Text", 
+  "label": "Description", 
+  "parentfield": "fields"
+ }
+]

@@ -1,0 +1,301 @@
+[
+ {
+  "in_create": 1, 
+  "module": "Core", 
+  "doctype": "DocType", 
+  "issingle": 1, 
+  "show_in_menu": 1, 
+  "name": "Control Panel", 
+  "idx": 1, 
+  "smallicon": "controller.png", 
+  "version": 27, 
+  "menu_index": 5
+ }, 
+ {
+  "parent": "Control Panel", 
+  "read": 1, 
+  "doctype": "DocPerm", 
+  "idx": 1, 
+  "create": 1, 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "Administrator", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "idx": 1, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "general", 
+  "fieldtype": "Section Break", 
+  "label": "General", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "date_format", 
+  "fieldtype": "Select", 
+  "label": "Date Format", 
+  "options": "yyyy-mm-dd\ndd-mm-yyyy\ndd/mm/yyyy\nmm/dd/yyyy\nmm-dd-yyyy", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 3, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "currency_format", 
+  "fieldtype": "Select", 
+  "label": "Currency Format", 
+  "options": "Millions\nLacs", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 4, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "password_expiry_days", 
+  "fieldtype": "Int", 
+  "label": "Password Expires in (days)", 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "Format: hh:mm example for one hour expiry set as 01:00. \nMax expiry will be 72 hours. Default is 24 hours", 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "idx": 5, 
+  "parenttype": "DocType", 
+  "fieldname": "session_expiry", 
+  "fieldtype": "Data", 
+  "label": "Session Expires in (time)", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 6, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "column_break0", 
+  "fieldtype": "Column Break", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 7, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "title", 
+  "fieldtype": "Data", 
+  "label": "Title", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 8, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "account_id", 
+  "fieldtype": "Data", 
+  "label": "Account Id", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 9, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "company_name", 
+  "fieldtype": "Data", 
+  "label": "Company Name", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 10, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "industry", 
+  "fieldtype": "Data", 
+  "label": "Industry", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 11, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "time_zone", 
+  "fieldtype": "Data", 
+  "label": "Time Zone", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 12, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "country", 
+  "fieldtype": "Data", 
+  "label": "Country", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 13, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "total_sms_sent", 
+  "fieldtype": "Int", 
+  "label": "Total SMS Sent", 
+  "permlevel": 1, 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 14, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "mail_server", 
+  "fieldtype": "Section Break", 
+  "label": "Mail Server", 
+  "parentfield": "fields"
+ }, 
+ {
+  "description": "Enter Email Id to receive Error Report sent by users.\nE.g.: support@iwebnotes.com", 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "idx": 15, 
+  "parenttype": "DocType", 
+  "fieldname": "support_email_id", 
+  "fieldtype": "Data", 
+  "label": "Support Email Id", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 16, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "letter_head_image", 
+  "fieldtype": "Data", 
+  "label": "Letter Head Image", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 17, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "column_break1", 
+  "fieldtype": "Column Break", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 18, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "mail_footer", 
+  "fieldtype": "Text", 
+  "label": "Mail Footer", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 19, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "defaults", 
+  "fieldtype": "Section Break", 
+  "label": "Defaults", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 20, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "DefaultValue", 
+  "fieldname": "system_defaults", 
+  "fieldtype": "Table", 
+  "label": "System Defaults", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 21, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "banner", 
+  "fieldtype": "Section Break", 
+  "label": "Banner", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 22, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "client_name", 
+  "fieldtype": "Text", 
+  "label": "Banner HTML", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 23, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "startup", 
+  "fieldtype": "Section Break", 
+  "label": "Startup", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 24, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "custom_startup_code", 
+  "fieldtype": "Code", 
+  "label": "Custom Startup Code", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 25, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "home_pages", 
+  "fieldtype": "Section Break", 
+  "label": "Home Pages", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 26, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "home_page", 
+  "fieldtype": "Link", 
+  "label": "Home Page", 
+  "options": "Page", 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 27, 
+  "parent": "Control Panel", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "fieldname": "default_home_pages", 
+  "fieldtype": "Table", 
+  "label": "Default Home Pages", 
+  "options": "Default Home Page", 
+  "parentfield": "fields"
+ }
+]

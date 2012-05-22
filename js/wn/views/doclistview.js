@@ -399,7 +399,7 @@ wn.views.ListView = Class.extend({
 		var me = this;
 		this.prepare_data(data);
 		rowhtml = '';
-				
+		
 		// make table
 		$.each(this.columns, function(i, v) {
 			rowhtml += _.template('<td style="width: <%=width%>"></td>', v);
@@ -410,6 +410,9 @@ wn.views.ListView = Class.extend({
 		$.each(this.columns, function(i, v) {
 			me.render_column(data, tr.cells[i], v);
 		});
+
+		// row style
+		$(row).css('margin', '0px -15px').css('padding', '5px');
 	},
 	prepare_data: function(data) {
 		data.fullname = wn.user_info(data.owner).fullname;

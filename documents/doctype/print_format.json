@@ -1,0 +1,75 @@
+[
+ {
+  "tag_fields": "doc_type", 
+  "module": "Core", 
+  "subject": "eval:(\"<span style='color:grey'>Module: <b>%(module)s</b>, Type: <b>%(doc_type)s</b>, Standard: <b>%(standard)s</b></span>\")", 
+  "version": 1, 
+  "doctype": "DocType", 
+  "autoname": "Prompt", 
+  "name": "Print Format", 
+  "idx": 1
+ }, 
+ {
+  "parent": "Print Format", 
+  "read": 1, 
+  "doctype": "DocPerm", 
+  "idx": 1, 
+  "create": 1, 
+  "write": 1, 
+  "parenttype": "DocType", 
+  "role": "Administrator", 
+  "parentfield": "permissions"
+ }, 
+ {
+  "parent": "Print Format", 
+  "doctype": "DocField", 
+  "reqd": 1, 
+  "in_filter": 1, 
+  "idx": 1, 
+  "label": "Module", 
+  "parenttype": "DocType", 
+  "options": "link:Module Def", 
+  "fieldname": "module", 
+  "fieldtype": "Select", 
+  "search_index": 1, 
+  "parentfield": "fields"
+ }, 
+ {
+  "idx": 2, 
+  "description": "Associate a DocType to the Print Format", 
+  "parent": "Print Format", 
+  "doctype": "DocField", 
+  "parenttype": "DocType", 
+  "options": "link:DocType", 
+  "fieldname": "doc_type", 
+  "fieldtype": "Select", 
+  "label": "DocType", 
+  "in_filter": 1, 
+  "parentfield": "fields"
+ }, 
+ {
+  "parent": "Print Format", 
+  "doctype": "DocField", 
+  "reqd": 1, 
+  "in_filter": 1, 
+  "idx": 3, 
+  "label": "Standard", 
+  "parenttype": "DocType", 
+  "options": "\nYes\nNo", 
+  "fieldname": "standard", 
+  "fieldtype": "Select", 
+  "search_index": 1, 
+  "parentfield": "fields"
+ }, 
+ {
+  "parent": "Print Format", 
+  "doctype": "DocField", 
+  "idx": 4, 
+  "label": "HTML", 
+  "parenttype": "DocType", 
+  "options": "HTML", 
+  "fieldname": "html", 
+  "fieldtype": "Code", 
+  "parentfield": "fields"
+ }
+]
