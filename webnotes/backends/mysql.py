@@ -1,11 +1,15 @@
+import webnotes
+
 class MySQLBackend():
+	in_transaction = False
+	column_map = {}
 	def __init__(self, host=None, user=None, password=None):
 		import MySQLdb, conf
-		
+				
 		db_name = user or getattr(conf, 'db_name')
 		
 		self.conn = MySQLdb.connect(host=host or getattr(conf, 'db_host', 'localhost'), 
-			user = db_name
+			user = db_name,
 			passwd= password or getattr(conf, 'db_password'))
 			
 		self.conn.converter[246]=float
@@ -28,7 +32,7 @@ class MySQLBackend():
 		# execute
 		try:
 			if values!=():
-				if debug: webnotes.msgprint(query % values)
+				if debug: webnotes.msgprint(query % tuple(values))				
 				self.cursor.execute(query, values)
 				
 			else:
@@ -43,12 +47,15 @@ class MySQLBackend():
 				raise e
 
 		# scrub output if required
-		if as_dict:
-			return self.fetch_as_dict()
-		elif as_list:
-			return self.fetch_as_list()
+		if as_list:
+			ret = self.fetch_as_list()
+		elif as_dict:
+			ret = self.fetch_as_dict()
 		else:
-			return self.cursor.fetchall()
+			ret = self.cursor.fetchall()		
+
+		return ret
+
 			
 	def check_transaction_status(self, query):
 		"""update `in_transaction`, validate ddl is not called within a transaction and
@@ -75,7 +82,16 @@ class MySQLBackend():
 				else:
 					webnotes.msgprint('A very long query was encountered. If you are trying to import data, please do so using smaller files')
 					raise Exception, 'Bad Query!!! Too many writes'
-					
+	
+	def begin(self):
+		self.sql("start transaction")
+		
+	def commit(self):
+		self.sql("commit")
+	
+	def rollback(self):
+		self.sql("rollback")
+	
 	def fetch_as_dict(self):
 		result = self.cursor.fetchall()
 		ret = []
@@ -86,18 +102,82 @@ class MySQLBackend():
 			ret.append(dict)
 		return ret
 		
-	def fetch_as_list(self, res):
+	def fetch_as_list(self):
 		return [[c for c in r] for r in self.cursor.fetchall()]
-		
-	def get(self, doctype_name, doc_name):
-		pass
+
+	def filter_columns(self, obj):
+		"""remove un-necessary columns"""
+
+		columns = self.get_columns(obj.get('doctype'))
+		ret = {}
+		for c in columns:
+			if obj.get(c) is not None:
+				ret[c] = obj.get(c)
+								
+		return ret
+
+	def get(self, doctype_name, name=None):
+		"""get list of records from the backend, 
+		   pass filters in a dict or using (`doctype_name`, `name`)"""
+		if isinstance(doctype_name, basestring):
+			return self.sql("""select * from `%s` where name=%s""" % (doctype_name, '%s'), name)
+		else:
+			filters = doctype_name
+			conditions, values = [], []
+			for key in filters:
+				if key=='doctype':
+					doctype_name = filters[key]
+				else:
+					conditions.append('`'+key+'`=%s')
+					values.append(filters[key])
+								
+			return self.sql("""select * from `%s` where %s""" % (doctype_name,
+				' and '.join(conditions)), values)
 
 	def insert(self, doc):
-		pass
-		
-	def update(self, doc):
-		pass
+		"""insert dict like object in database where property `doctype` is the table"""
+		import warnings
+		with warnings.catch_warnings(record=True) as w:
+			obj = self.filter_columns(doc)
+			self.sql("""insert into `%s` (%s) values (%s)""" % (doc.get('doctype'), 
+				', '.join(obj.keys()), (', %s' * len(obj.keys()))[2:]), obj.values())
 
-	def remove(self, doctype_name, doc_name):
+			# raise exception if mandatory is not 
+			if w and (str(w[0].message).endswith('default value')):
+				raise webnotes.ValidationError, str(w[0].message)
+
+	def update(self, doc):
+		"""update dict like object in database where property `doctype` is the table"""
+		obj = self.filter_columns(doc)
+		self.sql("""update `%s` set %s where name=%s""" % (doc.get('doctype'),
+			', '.join(["`%s`=%s" % (key, '%s') for key in obj.keys()]), '%s'), 
+			obj.values() + [obj.get('name')])
+			
+	def remove(self, doctype_name, name):
 		pass
 		
+	def get_columns(self, table):
+		"""get table columns"""
+		if not table in self.column_map:
+			self.column_map[table] = [c[0] for c in self.sql("desc `%s`" % table, as_list=True)]
+
+		return self.column_map[table]
+	
+	def get_tables(self):
+		"""get list of tables"""
+		return [c[0] for c in self.sql("show tables", as_list=True)]
+	
+	def create_user_and_database(self, db_name, db_password):
+		try:
+			self.sql("drop user '%s'@'localhost';" % db_name)
+		except Exception, e:
+			if e.args[0]!=1396: raise e
+
+		self.sql("create user %s@'localhost' identified by %s", (db_name, db_password))
+		self.sql("create database if not exists `%s`" % db_name)
+		self.sql("grant all privileges on `%s` . * to '%s'@'localhost'" % (db_name, db_name))
+		self.sql("flush privileges")
+		self.sql("use `%s`" % db_name)
+	
+	def close(self):
+		self.conn and self.conn.close()

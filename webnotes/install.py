@@ -25,6 +25,15 @@
 
 import os,sys
 
+def install(root_login, root_password):
+	"""db_name, db_password in conf"""
+	import webnotes.backends
+	import conf
+	
+	conn = backends.get('mysql', login=root_login, password=root_password)
+
+	
+
 class Installer:
 	def __init__(self, root_login, root_password):
 

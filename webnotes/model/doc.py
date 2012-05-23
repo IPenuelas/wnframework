@@ -61,26 +61,21 @@ class Document:
 	
 	def get_obj(self):
 		"""get object with valid columns"""
-		self.columns = webnotes.conn.get_columns(self.doctype)
+		self.columns = self.backend.get_columns(self.doctype)
 		obj = {}
 		for c in columns:
 			if self.__dict__.get(c) is not None:
 				obj[c] = self.__dict__[c]
-				
+
 		return obj
 	
 	def insert(self):
 		"""insert new record"""
-		obj = self.get_obj()
-		webnotes.conn.sql("""insert into `%s` (%s) values (%s)""" % (self.doctype, '%s', '%s'),
-			obj.keys(), obj.values())
-
+		self.backend.insert(self)
+		
 	def update(self):
 		"""update values"""
-		obj = self.get_obj()
-		webnotes.conn.sql("""update `%s` set %s where name=%s""" % (self.doctype, 
-			', '.join(["`%s`=%s" % (key, '%s') for key in obj.keys()], '%s'), 
-			obj.values() + ['name']))
+		self.backend.update(self)
 
 
 '''

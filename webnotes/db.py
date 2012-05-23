@@ -320,13 +320,6 @@ class Database:
 						(dt['doctype'], " and ".join(conditions)))
 			except:
 				return None
-
-	def get_columns(self, table):
-		"""get table columns"""
-		if not table in self.column_map:
-			self.column_map[table] = [c[0] for c in self.sql("desc `%s`" % table)]
-
-		return self.column_map[table]
 			
 	def close(self):
 		"""
