@@ -25,13 +25,15 @@ globals attached to webnotes module
 + some utility functions that should probably be moved
 """
 
-core_models = (
+core_doctypes = (
 	'Comment', 'Control Panel', 'Custom Field', 'Custom Script', 'Customize Form',
 	'Customize Form Field', 'DefaultValue', 'DocField', 'DocPerm', 'DocType', 'Default Home Page'
 	'Event', 'Event Role', 'Event User', 'File Data', 'Letter Head', 'Module Def',
 	'Page', 'Page Role', 'Print Format', 'Profile', 'Property Setter', 'Report', 'Role',
-	'System Console', 'Tag', 'ToDo', 'UserRole', 'login', 'data-import-tool'
+	'System Console', 'Tag', 'ToDo', 'UserRole'
 )
+
+core_pages = ('login', 'data-import-tool')
 
 version = '3'
 form_dict = {}

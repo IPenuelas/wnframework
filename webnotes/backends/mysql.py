@@ -3,20 +3,22 @@ import webnotes
 class MySQLBackend():
 	in_transaction = False
 	column_map = {}
-	def __init__(self, host=None, user=None, password=None):
+	def __init__(self, host=None, user=None, password=None, db_name=None):
+		"""create connection and use database if not root"""
 		import MySQLdb, conf
-				
-		db_name = user or getattr(conf, 'db_name')
+		
+		if not db_name:
+			db_name = user or getattr(conf, 'db_name')
 		
 		self.conn = MySQLdb.connect(host=host or getattr(conf, 'db_host', 'localhost'), 
-			user = db_name,
-			passwd= password or getattr(conf, 'db_password'))
-			
+			user = user or db_name,
+			passwd = password or getattr(conf, 'db_password'))
+	
 		self.conn.converter[246]=float
 		self.conn.set_character_set('utf8')
 		self.cursor = self.conn.cursor()
 		
-		if user!='root':
+		if db_name!='root':
 			self.use(db_name)
 		
 	def use(self, db_name):
@@ -106,7 +108,7 @@ class MySQLBackend():
 		return [[c for c in r] for r in self.cursor.fetchall()]
 
 	def filter_columns(self, obj):
-		"""remove un-necessary columns"""
+		"""filter dict with valid table columns"""
 
 		columns = self.get_columns(obj.get('doctype'))
 		ret = {}
@@ -152,10 +154,32 @@ class MySQLBackend():
 		self.sql("""update `%s` set %s where name=%s""" % (doc.get('doctype'),
 			', '.join(["`%s`=%s" % (key, '%s') for key in obj.keys()]), '%s'), 
 			obj.values() + [obj.get('name')])
-			
+	
 	def remove(self, doctype_name, name):
 		pass
+	
+	def insert_doclist(self, doclist):
+		"""insert doclist"""
+		map(self.insert, doclist)
 		
+	def update_doclist(self, doclist):
+		"""update doclist"""
+		map(self.update, doclist)
+	
+	def get_doclist(self, doctype_name, name):
+		"""get doclist, list of doclists"""
+		main_list = self.get(doctype_name, name)
+		out = []
+		for doc in main_list:
+			out.append([doc].extend(self.get_children(doc)))
+		
+		return out
+
+	def get_children(self, doc):
+		"""get children of the given doc"""
+		# TODO
+		return []
+	
 	def get_columns(self, table):
 		"""get table columns"""
 		if not table in self.column_map:
@@ -167,15 +191,17 @@ class MySQLBackend():
 		"""get list of tables"""
 		return [c[0] for c in self.sql("show tables", as_list=True)]
 	
-	def create_user_and_database(self, db_name, db_password):
+	def create_user_and_database(self, db_name, db_password, user=None):
+		"""create MySQL db with user and database as `db_name` and password as `db_password`"""
+		if not user: user = db_name
 		try:
-			self.sql("drop user '%s'@'localhost';" % db_name)
+			self.sql("drop user '%s'@'localhost';" % user)
 		except Exception, e:
 			if e.args[0]!=1396: raise e
 
-		self.sql("create user %s@'localhost' identified by %s", (db_name, db_password))
+		self.sql("create user %s@'localhost' identified by %s", (user, db_password))
 		self.sql("create database if not exists `%s`" % db_name)
-		self.sql("grant all privileges on `%s` . * to '%s'@'localhost'" % (db_name, db_name))
+		self.sql("grant all privileges on `%s` . * to '%s'@'localhost'" % (user, db_name))
 		self.sql("flush privileges")
 		self.sql("use `%s`" % db_name)
 	
