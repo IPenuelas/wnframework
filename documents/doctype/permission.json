@@ -1,120 +1,97 @@
 [
  {
-  "istable": 1, 
-  "module": "Core", 
   "doctype": "DocType", 
-  "autoname": "PERM.#####", 
-  "name": "DocPerm", 
-  "idx": 1
+  "autoname": "autonumber", 
+  "name": "Permission", 
  }, 
  {
   "idx": 1, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "width": "40px", 
   "default": "0", 
   "doctype": "DocField", 
-  "parenttype": "DocType", 
   "fieldname": "permlevel", 
   "fieldtype": "Int", 
   "label": "Level", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 2, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "width": "150px", 
   "doctype": "DocField", 
-  "parenttype": "DocType", 
   "options": "Role", 
   "fieldname": "role", 
   "fieldtype": "Link", 
   "label": "Role", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 3, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
   "width": "32px", 
-  "parenttype": "DocType", 
   "fieldname": "read", 
   "fieldtype": "Check", 
   "label": "Read", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 4, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
   "width": "32px", 
-  "parenttype": "DocType", 
   "fieldname": "write", 
   "fieldtype": "Check", 
   "label": "Write", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 5, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
   "width": "32px", 
-  "parenttype": "DocType", 
   "fieldname": "create", 
   "fieldtype": "Check", 
   "label": "Create", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 6, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
   "width": "32px", 
-  "parenttype": "DocType", 
   "fieldname": "submit", 
   "fieldtype": "Check", 
   "label": "Submit", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 7, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
   "width": "32px", 
-  "parenttype": "DocType", 
   "fieldname": "cancel", 
   "fieldtype": "Check", 
   "label": "Cancel", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 8, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
   "width": "32px", 
-  "parenttype": "DocType", 
   "fieldname": "execute", 
   "fieldtype": "Check", 
   "label": "Execute", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 9, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
-  "parenttype": "DocType", 
   "fieldname": "amend", 
   "fieldtype": "Check", 
   "label": "Amend", 
-  "parentfield": "fields"
  }, 
  {
   "idx": 10, 
-  "parent": "DocPerm", 
+  "parent": "Permission", 
   "doctype": "DocField", 
-  "parenttype": "DocType", 
   "fieldname": "match", 
   "fieldtype": "Data", 
   "label": "Match", 
-  "parentfield": "fields"
  }
 ]

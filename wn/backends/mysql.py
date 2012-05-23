@@ -1,4 +1,4 @@
-import webnotes
+import wn
 
 class MySQLBackend():
 	in_transaction = False
@@ -34,11 +34,11 @@ class MySQLBackend():
 		# execute
 		try:
 			if values!=():
-				if debug: webnotes.msgprint(query % tuple(values))				
+				if debug: wn.msgprint(query % tuple(values))				
 				self.cursor.execute(query, values)
 				
 			else:
-				if debug: webnotes.msgprint(query)
+				if debug: wn.msgprint(query)
 				self.cursor.execute(query)
 				
 		except Exception, e:
@@ -82,7 +82,7 @@ class MySQLBackend():
 					self.commit()
 					self.begin()
 				else:
-					webnotes.msgprint('A very long query was encountered. If you are trying to import data, please do so using smaller files')
+					wn.msgprint('A very long query was encountered. If you are trying to import data, please do so using smaller files')
 					raise Exception, 'Bad Query!!! Too many writes'
 	
 	def begin(self):
@@ -146,7 +146,7 @@ class MySQLBackend():
 
 			# raise exception if mandatory is not 
 			if w and (str(w[0].message).endswith('default value')):
-				raise webnotes.ValidationError, str(w[0].message)
+				raise wn.ValidationError, str(w[0].message)
 
 	def update(self, doc):
 		"""update dict like object in database where property `doctype` is the table"""
@@ -191,19 +191,34 @@ class MySQLBackend():
 		"""get list of tables"""
 		return [c[0] for c in self.sql("show tables", as_list=True)]
 	
-	def create_user_and_database(self, db_name, db_password, user=None):
+	def create_user_and_database(self, db_name=None, password=None, user=None):
 		"""create MySQL db with user and database as `db_name` and password as `db_password`"""
-		if not user: user = db_name
+		import conf
+		
+		# default from conf
+		if not db_name: db_name = conf.db_name
+		if not password: password = conf.db_password
+		if not user: user = getattr(conf, 'db_user') or db_name
+		
 		try:
 			self.sql("drop user '%s'@'localhost';" % user)
 		except Exception, e:
 			if e.args[0]!=1396: raise e
 
-		self.sql("create user %s@'localhost' identified by %s", (user, db_password))
-		self.sql("create database if not exists `%s`" % db_name)
+		self.sql("create user %s@'localhost' identified by %s", (user, password))
+		self.sql("drop database if exists `%s`" % db_name)
+		self.sql("create database `%s`" % db_name)
 		self.sql("grant all privileges on `%s` . * to '%s'@'localhost'" % (user, db_name))
 		self.sql("flush privileges")
 		self.sql("use `%s`" % db_name)
 	
+	def create_table(self, doclist):
+		"""create table"""
+		from wn.backends import mysql_schema
+		mysql_schema.create_table(self, doclist)
+	
 	def close(self):
 		self.conn and self.conn.close()
+
+		import wn.backends
+		del wn.backends.connections['mysql']

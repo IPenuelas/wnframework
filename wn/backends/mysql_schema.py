@@ -82,7 +82,7 @@ def create_table(conn, doclistobj):
 
 	# add std columns
 	for d in std_columns:
-		make_col_definition(d, columns, constraints)
+		make_col_definition(d, columns, constraints, doclistobj.get('autoname', '').lower())
 
 	# is table
 	for d in (doclistobj.get('istable') and std_columns_table or std_columns_main):
@@ -93,11 +93,12 @@ def create_table(conn, doclistobj):
 		make_col_definition(d, columns, constraints)
 	
 	query = template % (doclistobj.get('name'), ',\n'.join(columns + constraints))
-	#print query
 	
-	conn.sql("""set foreign_key_checks=0""")	
-	conn.sql(query)
-	conn.sql("""set foreign_key_checks=1""")	
+	conn.sql("""set foreign_key_checks=0""")
+	try:
+		conn.sql(query)
+	finally:
+		conn.sql("""set foreign_key_checks=1""")	
 
 def remake_table(conn, doclistobj):
 	"""drop table and remake it, backing up the data first"""
@@ -127,7 +128,7 @@ def remake_table(conn, doclistobj):
 	os.remove(fname)
 	
 
-def make_col_definition(d, columns, constraints):
+def make_col_definition(d, columns, constraints, autoname=None):
 	"""make col definition from docfield"""
 	
 	if not d.get('fieldtype').lower() in type_map:
@@ -146,9 +147,18 @@ def make_col_definition(d, columns, constraints):
 		"fieldname": d.get('fieldname'),
 		"default": d.get("default")!=None and (' not null default "%s"' %\
 		 	str(d.get('default')).replace('"', '\"')) or '',
-		"keys": d.get('fieldname')=='name' and ' primary key' or '',
+		"keys": '',
 		"not_null": d.get('reqd') and ' not null' or ''
 	}
+	
+	if d.get('fieldname')=='name':
+		args['keys'] = ' primary key'
+		
+		# auto_increment
+		if autoname=='autonumber':
+			args['fieldtype'] = 'mediumint'
+			args['length'] = ''
+			args['keys'] += ' auto_increment'
 	
 	columns.append('`%(fieldname)s` %(fieldtype)s%(length)s%(not_null)s%(default)s%(keys)s' % args)
 	

@@ -3,18 +3,22 @@ import unittest, sys
 sys.path.append('controllers')
 sys.path.append('lib')
 
-import webnotes
-import webnotes.backends
+import wn
+import wn.backends
 import conf
-from webnotes.backends import mysql_schema
+from wn.backends import mysql_schema
 
 class TestMySQL(unittest.TestCase):
 	def setUp(self):
-		self.conn = webnotes.backends.get('mysql', user='root', password=conf.db_root_password)
+		self.conn = wn.backends.get('mysql', user='root', password=conf.db_root_password)
 		self.conn.create_user_and_database('test1', 'test1')
+
+	def tearDown(self):
+		self.conn.sql("drop database test1")
+		self.conn.close()
 	
 	def test_create_table(self):
-		from webnotes.model.doclist import DocList
+		from wn.model import DocList
 		table_def = DocList([{"doctype":"DocType", "name":"Test"},
 		{"doctype":"DocField", "fieldtype":"Data", "fieldname":"test_data", "reqd":1},
 		{"doctype":"DocField", "fieldtype":"Date", "fieldname":"test_date"},
@@ -35,7 +39,7 @@ class TestMySQL(unittest.TestCase):
 	def test_mandatory(self):
 		self.test_create_table()
 		rec = {"doctype":"Test", "name":"r1"}
-		self.assertRaises(webnotes.ValidationError, self.conn.insert, (rec))
+		self.assertRaises(wn.ValidationError, self.conn.insert, (rec))
 	
 	def test_update(self):
 		self.test_insert()
@@ -43,13 +47,10 @@ class TestMySQL(unittest.TestCase):
 		self.conn.update(rec)
 		self.assertEquals(self.conn.get("Test", "r1")[0].get("test_data"), rec.get("test_data"))
 	
-	def tearDown(self):
-		self.conn.sql("drop database test1")
-		self.conn.close()
 
 if __name__=='__main__':
 	try:
 		unittest.main()
 	finally:
-		if webnotes.message_log:
-			print webnotes.message_log
+		if wn.messages:
+			print wn.messages

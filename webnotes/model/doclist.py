@@ -35,7 +35,7 @@ class DocList:
 	"""
 	Collection of Documents with one parent and multiple children
 	"""
-	def __init__(self, doctype_name=None, doc_name=None):
+	def __init__(self, doctype_name=None, name=None):
 		self.doclist = []
 		self.obj = None
 		self.to_docstatus = 0
@@ -47,28 +47,23 @@ class DocList:
 	
 			self.doc = self.doclist[0]
 			
-		elif doctype_name and doc_name:
-			self.load_from_db(doctype_name, doc_name)
+		elif doctype_name and name:
+			self.load(doctype_name, name)
 
 
-	def load_from_db(self, doctype_name, doc_name):
+	def load(self, doctype_name, name):
 		"""
 			Load doclist from dt
 		"""
-		from webnotes.model.doc import Document, getchildren
+		from webnotes.model.doc import Document
 
-		doc = Document(doctype_name, doc_name)
-
-		# get all children types
-		tablefields = webnotes.model.meta.get_table_fields(doctype_name)
-
-		# load chilren
-		doclist = [doc,]
-		for t in tablefields:
-			doclist += getchildren(doc.name, t[0], t[1], doctype_name)
-
-		self.doclist = doclist
-		self.doc = doc
+		if doctype_name=='DocType':
+			self.conn = webnotes.backends.get('files')
+		
+		self.doclist = [Document(d) for d in self.conn.get_doclist(doctype_name, name)]
+		self.doc = doclist[0]
+		
+		doc = Document(doctype_name, name)
 		self.run_method('onload')
 
 	def __iter__(self):
@@ -108,20 +103,16 @@ class DocList:
 
 	def check_conflict(self):
 		"""
-			Raises exception if the modified time is not the same as in the database
+			Raises exception if the modified time is not the same as in the backend
 		"""
-		from webnotes.model.meta import is_single
+		updated_on = self.conn.get_value(self.doc.doctype, self.doc.name, 'updated_on')
 
-		if (not is_single(self.doc.doctype)) and (not cint(self.doc.fields.get('__islocal'))):
-			tmp = webnotes.conn.sql("""
-				SELECT modified FROM `tab%s` WHERE name="%s" for update"""
-				% (self.doc.doctype, self.doc.name))
-
-			if tmp and str(tmp[0][0]) != str(self.doc.modified):
+			if last_updated != self.doc.updated_on:
 				webnotes.msgprint("""
 				Document has been modified after you have opened it.
 				To maintain the integrity of the data, you will not be able to save your changes.
-				Please refresh this document. [%s/%s]""" % (tmp[0][0], self.doc.modified), raise_exception=1)
+				Please refresh this document. [%s/%s]""" % (last_updated, self.doc.updated_on), 
+				raise_exception=1)
 
 	def check_permission(self):
 		"""
@@ -129,21 +120,6 @@ class DocList:
 		"""
 		if not self.doc.check_perm(verbose=1):
 			webnotes.msgprint("Not enough permission to save %s" % self.doc.doctype, raise_exception=1)
-
-	def check_links(self):
-		"""
-			Checks integrity of links (throws exception if links are invalid)
-		"""
-		ref, err_list = {}, []
-		for d in self.doclist:
-			if not ref.get(d.doctype):
-				ref[d.doctype] = d.make_link_list()
-
-			err_list += d.validate_links(ref[d.doctype])
-
-		if err_list:
-			webnotes.msgprint("""[Link Validation] Could not find the following values: %s.
-			Please correct and resave. Document Not Saved.""" % ', '.join(err_list), raise_exception=1)
 
 	def update_timestamps_and_docstatus(self):
 		"""
@@ -169,8 +145,6 @@ class DocList:
 		"""
 		self.check_conflict()
 		self.check_permission()
-		if check_links:
-			self.check_links()
 		self.update_timestamps_and_docstatus()
 
 	def run_method(self, method):
@@ -255,57 +229,6 @@ class DocList:
 		self.save_main()
 		self.save_children()
 		self.run_method('on_update_after_submit')
-
-# clone
-
-def clone(source_doclist):
-	"""clone doclist"""
-	from webnotes.model.doc import Document
-	new_doclist = []
-	new_parent = Document(source_doclist.doc.fields.copy())
-	new_parent.name = 'Temp/001'
-	new_parent.fields['__islocal'] = 1
-	new_parent.fields['docstatus'] = 0
-
-	if new_parent.fields.has_key('amended_from'):
-		new_parent.fields['amended_from'] = None
-		new_parent.fields['amendment_date'] = None
-
-	new_parent.save(1)
-
-	new_doclist.append(new_parent)
-
-	for d in source_doclist.doclist[1:]:
-		newd = Document(d.fields.copy())
-		newd.name = None
-		newd.fields['__islocal'] = 1
-		newd.fields['docstatus'] = 0
-		newd.parent = new_parent.name
-		new_doclist.append(newd)
-	
-	doclistobj = DocList()
-	doclistobj.docs = new_doclist
-	doclistobj.doc = new_doclist[0]
-	doclistobj.doclist = new_doclist
-	doclistobj.children = new_doclist[1:]
-	doclistobj.save()
-	return doclistobj
-
-
-# for bc
-def getlist(doclist, parentfield):
-	"""
-		Return child records of a particular type
-	"""
-	import webnotes.model.utils
-	return webnotes.model.utils.getlist(doclist, parentfield)
-
-def copy_doclist(doclist, no_copy = []):
-	"""
-		Make a copy of the doclist
-	"""
-	import webnotes.model.utils
-	return webnotes.model.utils.copy_doclist(doclist, no_copy)
 
 def get_model_object(doclist):
 	"""get the instace of DocList from modules"""

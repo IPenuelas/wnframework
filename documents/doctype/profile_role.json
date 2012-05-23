@@ -4,16 +4,22 @@
   "module": "Core", 
   "doctype": "DocType", 
   "autoname": "UR.#####", 
-  "name": "UserRole", 
+  "name": "Profile Role", 
   "idx": 1
  }, 
  {
-  "parent": "UserRole", 
+  "doctype": "DocField", 
+  "idx": 1, 
+  "label": "Profile", 
+  "options": "Profile", 
+  "fieldname": "profile", 
+  "fieldtype": "Link", 
+  "parentfield": "fields"
+ },
+ {
   "doctype": "DocField", 
   "idx": 1, 
   "label": "Role", 
-  "width": "200px", 
-  "parenttype": "DocType", 
   "options": "Role", 
   "fieldname": "role", 
   "fieldtype": "Link", 

@@ -1,0 +1,25 @@
+[
+ {
+   "doctype":"DocType",
+   "name":"Series"
+ },
+ {
+   "doctype":"DocField",
+   "fieldname": "for_doctype",
+   "fieldtype": "Link",
+   "label": "For DocType",
+   "options": "DocType"
+ },
+ {
+   "doctype":"DocField",
+   "fieldname": "prefix",
+   "label": "Prefix",
+   "fieldtype": "Data"
+ },
+ {
+   "doctype":"DocField",
+   "fieldname": "current",
+   "label": "Current Index",
+   "fieldtype": "Int"
+ }
+]

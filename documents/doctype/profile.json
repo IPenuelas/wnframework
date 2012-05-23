@@ -1,58 +1,9 @@
 [
  {
   "allow_attach": 1, 
-  "search_fields": "first_name, last_name", 
-  "module": "Core", 
   "doctype": "DocType", 
   "name": "Profile", 
   "idx": 1, 
-  "print_outline": "Yes", 
-  "max_attachments": 1, 
-  "version": 33
- }, 
- {
-  "idx": 1, 
-  "parent": "Profile", 
-  "read": 1, 
-  "create": 1, 
-  "doctype": "DocPerm", 
-  "write": 1, 
-  "parenttype": "DocType", 
-  "role": "Administrator", 
-  "parentfield": "permissions"
- }, 
- {
-  "idx": 2, 
-  "parent": "Profile", 
-  "read": 1, 
-  "create": 1, 
-  "doctype": "DocPerm", 
-  "write": 1, 
-  "parenttype": "DocType", 
-  "role": "System Manager", 
-  "parentfield": "permissions"
- }, 
- {
-  "idx": 3, 
-  "parent": "Profile", 
-  "read": 1, 
-  "doctype": "DocPerm", 
-  "write": 1, 
-  "parenttype": "DocType", 
-  "role": "Administrator", 
-  "permlevel": 1, 
-  "parentfield": "permissions"
- }, 
- {
-  "idx": 4, 
-  "parent": "Profile", 
-  "read": 1, 
-  "doctype": "DocPerm", 
-  "write": 1, 
-  "parenttype": "DocType", 
-  "role": "All", 
-  "match": "owner", 
-  "parentfield": "permissions"
  }, 
  {
   "idx": 1, 
@@ -98,17 +49,6 @@
   "fieldtype": "Check", 
   "hidden": 1, 
   "label": "Unsubscribed", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 5, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "fieldname": "recent_documents", 
-  "fieldtype": "Text", 
-  "hidden": 1, 
-  "label": "Recent Documents", 
   "parentfield": "fields"
  }, 
  {
@@ -176,28 +116,6 @@
   "parentfield": "fields"
  }, 
  {
-  "idx": 12, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "fieldname": "bio", 
-  "fieldtype": "Text", 
-  "hidden": 1, 
-  "label": "Bio", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 13, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "fieldname": "interests", 
-  "fieldtype": "Text", 
-  "hidden": 1, 
-  "label": "Interests", 
-  "parentfield": "fields"
- }, 
- {
   "idx": 14, 
   "parent": "Profile", 
   "doctype": "DocField", 
@@ -205,98 +123,6 @@
   "fieldname": "birth_date", 
   "fieldtype": "Date", 
   "label": "Birth Date", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 15, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "fieldname": "activities", 
-  "fieldtype": "Text", 
-  "hidden": 1, 
-  "label": "Activities", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 16, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "fieldname": "messanger_status", 
-  "fieldtype": "Data", 
-  "label": "Messanger Status", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 17, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "options": "\nSystem User\nPartner", 
-  "fieldname": "user_type", 
-  "fieldtype": "Select", 
-  "label": "User Type", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 18, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "fieldname": "section_break0", 
-  "fieldtype": "Section Break", 
-  "permlevel": 1, 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 19, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "width": "50%", 
-  "parenttype": "DocType", 
-  "fieldname": "roles", 
-  "fieldtype": "Column Break", 
-  "label": "Roles", 
-  "permlevel": 1, 
-  "parentfield": "fields"
- }, 
- {
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "idx": 20, 
-  "default": "Simple", 
-  "label": "User Roles", 
-  "permlevel": 1, 
-  "parenttype": "DocType", 
-  "fieldname": "userroles", 
-  "fieldtype": "Table", 
-  "options": "UserRole", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 21, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "width": "50%", 
-  "parenttype": "DocType", 
-  "fieldname": "system_defaults", 
-  "fieldtype": "Column Break", 
-  "label": "System Defaults", 
-  "permlevel": 1, 
-  "parentfield": "fields"
- }, 
- {
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "idx": 22, 
-  "default": "Simple", 
-  "label": "Defaults", 
-  "permlevel": 1, 
-  "parenttype": "DocType", 
-  "fieldname": "defaults", 
-  "fieldtype": "Table", 
-  "options": "DefaultValue", 
   "parentfield": "fields"
  }, 
  {
@@ -340,16 +166,6 @@
   "parentfield": "fields"
  }, 
  {
-  "idx": 27, 
-  "parent": "Profile", 
-  "doctype": "DocField", 
-  "width": "50%", 
-  "parenttype": "DocType", 
-  "fieldname": "column_break1", 
-  "fieldtype": "Column Break", 
-  "parentfield": "fields"
- }, 
- {
   "idx": 28, 
   "parent": "Profile", 
   "doctype": "DocField", 
@@ -389,18 +205,6 @@
   "fieldtype": "Data", 
   "hidden": 1, 
   "label": "Background Image", 
-  "parentfield": "fields"
- }, 
- {
-  "idx": 32, 
-  "parent": "Profile", 
-  "no_copy": 1, 
-  "doctype": "DocField", 
-  "parenttype": "DocType", 
-  "fieldname": "file_list", 
-  "fieldtype": "Text", 
-  "hidden": 1, 
-  "label": "File List", 
   "parentfield": "fields"
  }
 ]
