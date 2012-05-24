@@ -21,7 +21,11 @@ def get(backend_type, **args):
 			import mysql
 			connections['mysql'] = mysql.MySQLBackend(**args)
 		
-		if backend_type.lower()=='files':
+		elif backend_type=='mysql_obj':
+			import mysql_obj
+			connections['mysql_obj'] = mysql_obj.MySQLObjectBackend(**args)
+		
+		elif backend_type.lower()=='files':
 			import files
 			connections['files'] = files.FilesBackend()
 

@@ -9,9 +9,10 @@ import conf
 
 class TestModels(unittest.TestCase):
 	def setUp(self):
-		self.conn = wn.backends.get('files')
-		self.conn.insert_doclist([{"doctype":"DocType", "name":"Test", 
-			"controller":"wn.tests.test_controller.Test"},
+		self.files = wn.backends.get('files')
+
+		self.files.insert_doclist([{"doctype":"DocType", "name":"Test", 
+			"controller":"wn.tests.test_controller.Test", "backend":"mysql"},
 		{"doctype":"DocField", "fieldtype":"Data", "fieldname":"test_data", "reqd":1},
 		{"doctype":"DocField", "fieldtype":"Date", "fieldname":"test_date"},
 		{"doctype":"DocField", "fieldtype":"Text", "fieldname":"test_text"},
@@ -20,16 +21,21 @@ class TestModels(unittest.TestCase):
 		{"doctype":"DocField", "fieldtype":"Currency", "fieldname":"test_currency"},
 		])
 		
-	def tearDown(self):
-		self.conn.remove("DocType", "Test")
 		
-	def test_model_get(self):
-		testobj = wn.model.get('DocType', 'Test')
-		self.assertTrue(testobj.test_property)
-
+		self.conn = wn.backends.get('mysql', user='root', password=conf.db_root_password)
+		self.conn.create_user_and_database('test1', 'test1')
+		self.conn.create_table(wn.model.get('DocType', 'Test'))
+	
+	def test_get(self):
+		wn.model.DocList([{"name":"r1", "test_data":"hello", "doctype":"Test"}]).insert()
+		obj = wn.model.get('Test', 'r1')
+		self.assertTrue(obj.test_property)
+		self.assertTrue(obj.get('test_data')=='hello')
+	
+	def tearDown(self):
+		self.files.remove('DocType', 'files')
+		self.conn.sql("drop database test1")
+		self.conn.close()
+		
 if __name__=='__main__':
-	try:
-		unittest.main()
-	finally:
-		if wn.messages:
-			print wn.messages
+	unittest.main()

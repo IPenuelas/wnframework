@@ -19,13 +19,6 @@ class TestModel(unittest.TestCase):
 		from webnotes.model.utils import read_doclist
 		doclist = read_doclist('DocType', 'DocType')
 		self.assertTrue(doclist[0]['name'] == 'DocType')
-		
-	def test_write(self):
-		return
-		for fname in os.listdir('lib/documents/page'):
-			from webnotes.model.utils import uncommonify_doclist, write_doclist
-			with open(os.path.join('lib/documents/page', fname), 'r') as txtfile:
-				write_doclist(uncommonify_doclist(eval(txtfile.read())))
 	
 	def test_doclistobj_get(self):
 		from webnotes.model.utils import read_doclist
@@ -43,7 +36,7 @@ class TestModel(unittest.TestCase):
 		from webnotes.schema import make_table
 		from webnotes.model.doclist import DocList
 		
-		print make_table(DocList(read_doclist('DocType', 'DocType')))
+		make_table(DocList(read_doclist('DocType', 'DocType')))
 			
 
 			

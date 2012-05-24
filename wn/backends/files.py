@@ -29,7 +29,7 @@ class FilesBackend:
 	def update_doclist(self, doclist):
 		self.insert_doclists(doclist)
 		
-	def get_doclist(self, doctype_name, name):
+	def get(self, doctype_name, name):
 		"""get doclist"""
 		import json, os
 		fpath = self.doc_path(doctype_name, name)
@@ -38,10 +38,15 @@ class FilesBackend:
 				return json.loads(jsonfile.read())
 		else:
 			return []
+			
+	def get_doclist(self, filters):
+		"""get multiple doclists"""
+		# TODO
+		return []
 	
 	def get_value(self, doctype_name, name, key, default=None):
 		"""get a particular value"""
-		doclist = self.get_doclist(doctype_name, name)
+		doclist = self.get(doctype_name, name)
 		return doclist and doclist[0].get(key, default) or default
 	
 	def remove(self, doctype_name, name):

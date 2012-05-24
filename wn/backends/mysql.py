@@ -1,6 +1,7 @@
 import wn
 
 class MySQLBackend():
+	backend_type = 'mysql'
 	in_transaction = False
 	column_map = {}
 	def __init__(self, host=None, user=None, password=None, db_name=None):
@@ -23,7 +24,7 @@ class MySQLBackend():
 		
 	def use(self, db_name):
 		"""switch to database db_name"""
-		self._conn.select_db(db_name)
+		self.conn.select_db(db_name)
 		self.cur_db_name = db_name
 		
 	def sql(self, query, values=(), as_dict = 1, as_list = 0, debug=0, ignore_ddl=0):
@@ -34,11 +35,11 @@ class MySQLBackend():
 		# execute
 		try:
 			if values!=():
-				if debug: wn.msgprint(query % tuple(values))				
+				if debug: print query % tuple(values)
 				self.cursor.execute(query, values)
 				
 			else:
-				if debug: wn.msgprint(query)
+				if debug: print query
 				self.cursor.execute(query)
 				
 		except Exception, e:
@@ -109,7 +110,9 @@ class MySQLBackend():
 
 	def filter_columns(self, obj):
 		"""filter dict with valid table columns"""
-
+		if not obj.get('doctype'):
+			raise Exception, "doctype not set"
+			
 		columns = self.get_columns(obj.get('doctype'))
 		ret = {}
 		for c in columns:
@@ -120,9 +123,15 @@ class MySQLBackend():
 
 	def get(self, doctype_name, name=None):
 		"""get list of records from the backend, 
-		   pass filters in a dict or using (`doctype_name`, `name`)"""
+		   pass filters in a dict or using (`doctype_name`, `name`)
+		   add the "doctype" property by default
+		"""
 		if isinstance(doctype_name, basestring):
-			return self.sql("""select * from `%s` where name=%s""" % (doctype_name, '%s'), name)
+			rec = self.sql("""select * from `%s` where name=%s""" % (doctype_name, '%s'), name)
+			if rec: 
+				rec[0]['doctype'] = doctype_name
+				rec = rec + self.get_children(rec[0])
+				return rec
 		else:
 			filters = doctype_name
 			conditions, values = [], []
@@ -133,8 +142,9 @@ class MySQLBackend():
 					conditions.append('`'+key+'`=%s')
 					values.append(filters[key])
 								
-			return self.sql("""select * from `%s` where %s""" % (doctype_name,
-				' and '.join(conditions)), values)
+			return [d.update('doctype', filters['doctype']) for d in \
+				self.sql("""select * from `%s` where %s""" % (doctype_name,
+				' and '.join(conditions)), values)]
 
 	def insert(self, doc):
 		"""insert dict like object in database where property `doctype` is the table"""
@@ -166,13 +176,13 @@ class MySQLBackend():
 		"""update doclist"""
 		map(self.update, doclist)
 	
-	def get_doclist(self, doctype_name, name):
-		"""get doclist, list of doclists"""
-		main_list = self.get(doctype_name, name)
+	def get_doclist(self, filters):
+		"""get mulitple doclists"""
+		main_list = self.get(filters)
 		out = []
 		for doc in main_list:
 			out.append([doc].extend(self.get_children(doc)))
-		
+				
 		return out
 
 	def get_children(self, doc):
@@ -198,7 +208,7 @@ class MySQLBackend():
 		# default from conf
 		if not db_name: db_name = conf.db_name
 		if not password: password = conf.db_password
-		if not user: user = getattr(conf, 'db_user') or db_name
+		if not user: user = getattr(conf, 'user', db_name)
 		
 		try:
 			self.sql("drop user '%s'@'localhost';" % user)
@@ -206,8 +216,7 @@ class MySQLBackend():
 			if e.args[0]!=1396: raise e
 
 		self.sql("create user %s@'localhost' identified by %s", (user, password))
-		self.sql("drop database if exists `%s`" % db_name)
-		self.sql("create database `%s`" % db_name)
+		self.sql("create database if not exists `%s`" % db_name)
 		self.sql("grant all privileges on `%s` . * to '%s'@'localhost'" % (user, db_name))
 		self.sql("flush privileges")
 		self.sql("use `%s`" % db_name)
@@ -221,4 +230,4 @@ class MySQLBackend():
 		self.conn and self.conn.close()
 
 		import wn.backends
-		del wn.backends.connections['mysql']
+		del wn.backends.connections[self.backend_type]

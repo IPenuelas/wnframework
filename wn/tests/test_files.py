@@ -27,7 +27,7 @@ class TestFiles(unittest.TestCase):
 	
 	def test_get(self):
 		self.test_insert()
-		doclist = self.conn.get_doclist('DocType', "Test")
+		doclist = self.conn.get('DocType', "Test")
 		self.assertTrue('test_data' in [t.get('fieldname') for t in doclist])
 	
 	def test_get_value(self):

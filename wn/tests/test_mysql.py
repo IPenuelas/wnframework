@@ -6,10 +6,10 @@ sys.path.append('lib')
 import wn
 import wn.backends
 import conf
-from wn.backends import mysql_schema
 
 class TestMySQL(unittest.TestCase):
 	def setUp(self):
+		a = wn
 		self.conn = wn.backends.get('mysql', user='root', password=conf.db_root_password)
 		self.conn.create_user_and_database('test1', 'test1')
 
@@ -27,7 +27,7 @@ class TestMySQL(unittest.TestCase):
 		{"doctype":"DocField", "fieldtype":"Float", "fieldname":"test_float"},
 		{"doctype":"DocField", "fieldtype":"Currency", "fieldname":"test_currency"},
 		])
-		mysql_schema.create_table(self.conn, table_def)
+		self.conn.create_table(table_def)
 		self.assertTrue("Test" in self.conn.get_tables())
 	
 	def test_insert(self):
@@ -49,8 +49,4 @@ class TestMySQL(unittest.TestCase):
 	
 
 if __name__=='__main__':
-	try:
-		unittest.main()
-	finally:
-		if wn.messages:
-			print wn.messages
+	unittest.main()

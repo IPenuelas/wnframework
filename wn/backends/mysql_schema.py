@@ -70,29 +70,98 @@ type_map = {
 	,'password':	('varchar', '180')
 	,'select':		('varchar', '180')
 	,'read only':	('varchar', '180')
-	,'blob':		('longblob', '')
 }
-	
+
+
 def create_table(conn, doclistobj):
 	"""make table based on given info"""
+	import wn
 	
 	template = """create table `%s` (%s) ENGINE=InnoDB CHARACTER SET=utf8"""
-
 	columns, constraints = [], []
 
-	# add std columns
-	for d in std_columns:
-		make_col_definition(d, columns, constraints, doclistobj.get('autoname', '').lower())
+	def column_def():
+		"""make col definition from docfield"""
+		if not d.get('fieldtype').lower() in type_map:
+			return
 
-	# is table
-	for d in (doclistobj.get('istable') and std_columns_table or std_columns_main):
-		make_col_definition(d, columns, constraints)
+		column_def.db_type, column_def.db_length = type_map[d.get("fieldtype").lower()]
+		
+		def set_length():
+			"""set length if specifed or take default"""
+			if column_def.db_length or d.get("length"):
+				column_def.db_length = '(%s)' % str(column_def.db_length or d.get("length"))
+
+		def set_defaults():
+			"""set numeric types to default to 0"""
+			if d.get('fieldtype').lower() in ('int', 'float', 'currency', 'check') and d.get('default')==None:
+				d['default'] = 0
+		
+		def set_as_primary_key():
+			"""set name as primary key for std_fields"""
+			if d.get('fieldname')=='name' and doclistobj.get('std_fields')!='No':			
+				args['keys'] = ' primary key'
+
+				# auto_increment
+				if doclistobj.get('autoname', '').lower()=='autonumber':
+					args['fieldtype'] = 'mediumint'
+					args['length'] = ''
+					args['keys'] += ' auto_increment'
+
+		def make_args():
+			"""make column def commands"""
+			return {
+				"fieldtype": column_def.db_type,
+				"length": column_def.db_length,
+				"fieldname": d.get('fieldname'),
+				"default": d.get("default")!=None and (' not null default "%s"' %\
+				 	str(d.get('default')).replace('"', '\"')) or '',
+				"keys": '',
+				"not_null": d.get('reqd') and ' not null' or ''
+			}
+		
+		def add_constraints():
+			"""add constraints for links and indexes"""
+			# constraints
+			if d.get('fieldtype')=='Link':
+				constraints.append('constraint foreign key `%s`(`%s`) references `%s`(name)' % \
+					(d.get('fieldname'), d.get('fieldname'), d.get('options')))
+
+			if d.get('index'):
+				constraints.append('index `%s`(`%s`)' % (d.get('fieldname'), d.get('fieldname')))
+
+		# start scrubbing
+		set_length()
+		set_defaults()
+		args = make_args()
+		set_as_primary_key()
+		add_constraints()
+
+		# add to columns
+		columns.append('`%(fieldname)s` %(fieldtype)s%(length)s%(not_null)s%(default)s%(keys)s' % args)
+		
+
+	# add std columns
+	if doclistobj.get("std_fields") != "No":
+		for d in std_columns:
+			column_def()
+
+		# is table
+		for d in (doclistobj.get('istable') and std_columns_table or std_columns_main):
+			column_def()
 
 	# fields
 	for d in doclistobj.get({"doctype":"DocField"}):
-		make_col_definition(d, columns, constraints)
+		column_def()
 	
-	query = template % (doclistobj.get('name'), ',\n'.join(columns + constraints))
+	# indexes
+	for i in doclistobj.get('indexes', []):
+		constraints.append("index `%s`(%s)" % (wn.code_style(i), i))
+	
+	# run the query!
+	query = template % (doclistobj.get('name'), ',\n'.join(columns + constraints))	
+	
+	#print query
 	
 	conn.sql("""set foreign_key_checks=0""")
 	try:
@@ -128,45 +197,5 @@ def remake_table(conn, doclistobj):
 	os.remove(fname)
 	
 
-def make_col_definition(d, columns, constraints, autoname=None):
-	"""make col definition from docfield"""
-	
-	if not d.get('fieldtype').lower() in type_map:
-		return
-	
-	db_type, db_length = type_map[d.get("fieldtype").lower()]
-	if db_length or d.get("length"):
-		db_length = '(%s)' % str(db_length or d.get("length"))
-	
-	if d.get('fieldtype').lower() in ('int', 'float', 'currency', 'check') and d.get('default')==None:
-		d['default'] = 0
-		
-	args = {
-		"fieldtype": db_type,
-		"length": db_length,
-		"fieldname": d.get('fieldname'),
-		"default": d.get("default")!=None and (' not null default "%s"' %\
-		 	str(d.get('default')).replace('"', '\"')) or '',
-		"keys": '',
-		"not_null": d.get('reqd') and ' not null' or ''
-	}
-	
-	if d.get('fieldname')=='name':
-		args['keys'] = ' primary key'
-		
-		# auto_increment
-		if autoname=='autonumber':
-			args['fieldtype'] = 'mediumint'
-			args['length'] = ''
-			args['keys'] += ' auto_increment'
-	
-	columns.append('`%(fieldname)s` %(fieldtype)s%(length)s%(not_null)s%(default)s%(keys)s' % args)
-	
-	# constraints
-	if d.get('fieldtype')=='Link':
-		constraints.append('constraint foreign key `%s`(`%s`) references `%s`(name)' % \
-			(d.get('fieldname'), d.get('fieldname'), d.get('options')))
-		
-	if d.get('index'):
-		constraints.append('index `%s`(`%s`)' % (d.get('fieldname'), d.get('fieldname')))
+
 

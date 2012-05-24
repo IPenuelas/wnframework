@@ -15,7 +15,7 @@ class DocList():
 	def load(self, doctype_name, name):
 		"""load from backend"""
 		self.backend = wn.backends.get_for(doctype_name)
-		self.doclist = self.backend.get_doclist(doctype_name, name)
+		self.doclist = self.backend.get(doctype_name, name)
 		self.doc = self.doclist[0]
 		
 	def get(self, name, default=None):
@@ -31,12 +31,12 @@ class DocList():
 					
 	def insert(self):
 		"""insert the doclist"""
-		self.backend = wn.backends.get_for(doctype_name)
+		self.backend = wn.backends.get_for(self.get('doctype'))
 		self.backend.insert_doclist(self.doclist)
 
 	def update(self):
 		"""update the doclist"""
-		self.backend = wn.backends.get_for(doctype_name)
+		self.backend = wn.backends.get_for(self.get('doctype'))
 		self.backend.update_doclist(self.doclist)
 
 def import_object(txt):
