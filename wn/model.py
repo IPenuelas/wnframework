@@ -16,6 +16,8 @@ class DocList():
 		"""load from backend"""
 		self.backend = wn.backends.get_for(doctype_name)
 		self.doclist = self.backend.get(doctype_name, name)
+		if not self.doclist:
+			raise wn.NotFoundError
 		self.doc = self.doclist[0]
 		
 	def get(self, name, default=None):
@@ -28,9 +30,14 @@ class DocList():
 				self.doclist) or default
 		else:
 			raise Exception, 'unable to identify %s' % str(name)
-					
+	
+	def set(self, name, value):
+		"""set local value in main doc"""
+		self.doc[name] = value
+	
 	def insert(self):
 		"""insert the doclist"""
+		self.autoname()
 		self.backend = wn.backends.get_for(self.get('doctype'))
 		self.backend.insert_doclist(self.doclist)
 
@@ -38,6 +45,10 @@ class DocList():
 		"""update the doclist"""
 		self.backend = wn.backends.get_for(self.get('doctype'))
 		self.backend.update_doclist(self.doclist)
+		
+	def autoname(self): 
+		"""name the record"""
+		pass
 
 def import_object(txt):
 	"""import a reference from a python module"""
@@ -60,7 +71,7 @@ def get(doctype_name, name):
 	else:
 		raise Exception, "must pass doctype as string or doclist"
 
-def get_value(doctype_name, name, key, default):
+def get_value(doctype_name, name, key, default=None):
 	"""get a value"""
 	return wn.backends.get_for(doctype_name).get_value(doctype_name, name, key, default)
 		

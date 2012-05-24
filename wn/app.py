@@ -2,7 +2,7 @@ user = None
 
 from webob import Request, Response
 import wsgiref.handlers
-import wn
+import wn, wn.model
 
 def application(environ, start_response):
 	"""wsgi application method"""
@@ -57,8 +57,7 @@ def handle():
 def load_session():
 	"""load session from cookie or parameter"""
 	wn.sid = wn.request.cookies.get('sid') or wn.request.params.get('sid') or 'guest'
-	import wn.model
-	wn.session = wn.model.get('Session', sid) or wn.model.DocList([{'user':'Guest'}])
+	wn.session = wn.model.get('Session', wn.sid) or wn.model.DocList([{'user':'Guest'}])
 
 whitelisted = []
 guest_methods = []

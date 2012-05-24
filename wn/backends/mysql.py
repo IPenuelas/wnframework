@@ -35,7 +35,11 @@ class MySQLBackend():
 		# execute
 		try:
 			if values!=():
-				if debug: print query % tuple(values)
+				if debug: 
+					if wn.response:
+						wn.response.log(query % tuple(values))
+					else:
+						print query % tuple(values)
 				self.cursor.execute(query, values)
 				
 			else:
@@ -189,6 +193,12 @@ class MySQLBackend():
 		"""get children of the given doc"""
 		# TODO
 		return []
+	
+	def get_value(self, doctype_name, name, key, default=None):
+		"""get single value"""
+		res = self.sql("""select `%s` from `%s` where name=%s""" % (key, doctype_name, '%s'), 
+			name)
+		return res and res[0].get(key, default) or default
 	
 	def get_columns(self, table):
 		"""get table columns"""

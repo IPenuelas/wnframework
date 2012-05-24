@@ -31,7 +31,22 @@ class TestModels(unittest.TestCase):
 		obj = wn.model.get('Test', 'r1')
 		self.assertTrue(obj.test_property)
 		self.assertTrue(obj.get('test_data')=='hello')
-	
+		
+	def test_fail(self):
+		self.assertRaises(wn.NotFoundError, wn.model.get, 'Test', 'r2')
+		
+	def test_duplicate(self):
+		wn.model.DocList([{"name":"r1", "test_data":"hello", "doctype":"Test"}]).insert()
+		self.assertRaises(Exception, wn.model.DocList([{"name":"r1", "test_data":"hello", 
+			"doctype":"Test"}]).insert, None)
+			
+	def test_update(self):
+		doclist = wn.model.DocList([{"name":"r1", "test_data":"hello", "doctype":"Test"}])
+		doclist.insert()
+		doclist.set('test_data', 'world')
+		doclist.update()
+		self.assertEquals(wn.model.get_value('Test', 'r1', 'test_data'), 'world')
+		
 	def tearDown(self):
 		self.files.remove('DocType', 'files')
 		self.conn.sql("drop database test1")

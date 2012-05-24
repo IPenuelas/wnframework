@@ -1,4 +1,5 @@
 import wn.model
 
 class User(wn.model.DocList):
-	pass
+	def autoname(self):
+		self.set('name', self.get('email'))

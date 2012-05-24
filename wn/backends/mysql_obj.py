@@ -53,3 +53,16 @@ class MySQLObjectBackend(MySQLBackend):
 	def remove(self, name):
 		"""remove object by name"""
 		self.sql("""delete from _statement where name=%s""", name)
+		
+	def get_value(self, doctype_name, name, key):
+		values = self.sql("""select value from _statement 
+			where name=%s and`key`=%s""", (name, key))
+		
+		if len(values) > 1: 
+			return [r['value'] for r in values]
+		elif len(values)==1:
+			return r['value']
+		else:
+			return None
+		
+	

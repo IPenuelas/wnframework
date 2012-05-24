@@ -4,6 +4,7 @@ wn server
 import os
 
 root_path = os.path.join(os.sep, *os.path.abspath(os.path.dirname(__file__)).split(os.sep)[:-2])
+request = response = None
 
 def code_style(txt):
 	"""return code friendly names"""
@@ -28,4 +29,5 @@ def random_sha1():
 	
 # Errors
 class ValidationError(Exception): pass
+class NotFoundError(Exception): pass
 
