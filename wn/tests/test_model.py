@@ -1,16 +1,17 @@
 import unittest, sys
-
 sys.path.append('controllers')
 sys.path.append('lib')
 
 import wn, wn.model
 import wn.backends
-import conf
 
 class TestModels(unittest.TestCase):
 	def setUp(self):
-		self.files = wn.backends.get('files')
+		import conf
+		conf.db_name = 'test1'
+		wn.install.setup_db()
 
+		self.files = wn.backends.get('files')
 		self.files.insert_doclist([{"doctype":"DocType", "name":"Test", 
 			"controller":"wn.tests.test_controller.Test", "backend":"mysql"},
 		{"doctype":"DocField", "fieldtype":"Data", "fieldname":"test_data", "reqd":1},
@@ -21,11 +22,9 @@ class TestModels(unittest.TestCase):
 		{"doctype":"DocField", "fieldtype":"Currency", "fieldname":"test_currency"},
 		])
 		
-		
-		self.conn = wn.backends.get('mysql', user='root', password=conf.db_root_password)
-		self.conn.create_user_and_database('test1', 'test1')
-		self.conn.create_table(wn.model.get('DocType', 'Test'))
-	
+		self.conn = wn.backends.get('mysql')
+		wn.model.get('DocType', "Test").setup()
+
 	def test_get(self):
 		wn.model.DocList([{"name":"r1", "test_data":"hello", "doctype":"Test"}]).insert()
 		obj = wn.model.get('Test', 'r1')
@@ -46,11 +45,11 @@ class TestModels(unittest.TestCase):
 		doclist.set('test_data', 'world')
 		doclist.update()
 		self.assertEquals(wn.model.get_value('Test', 'r1', 'test_data'), 'world')
-		
+
 	def tearDown(self):
-		self.files.remove('DocType', 'files')
-		self.conn.sql("drop database test1")
+		self.files.remove('DocType', 'Test')
 		self.conn.close()
+		wn.install.remove()
 		
 if __name__=='__main__':
 	unittest.main()

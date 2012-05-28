@@ -64,5 +64,8 @@ class MySQLObjectBackend(MySQLBackend):
 			return r['value']
 		else:
 			return None
+			
+	def setup(self, doclist):
+		pass
 		
 	

@@ -73,7 +73,7 @@ type_map = {
 }
 
 
-def create_table(conn, doclistobj):
+def create_table(conn, doctype):
 	"""make table based on given info"""
 	import wn
 	
@@ -98,12 +98,12 @@ def create_table(conn, doclistobj):
 				d['default'] = 0
 		
 		def set_as_primary_key():
-			"""set name as primary key for std_fields"""
-			if d.get('fieldname')=='name' and doclistobj.get('std_fields')!='No':			
+			"""set name as primary key unless specified as an index"""
+			if d.get('fieldname')=='name' and (not 'name' in doctype.get('indexes', [])):
 				args['keys'] = ' primary key'
 
 				# auto_increment
-				if doclistobj.get('autoname', '').lower()=='autonumber':
+				if doctype.get('autoname', '').lower()=='autonumber':
 					args['fieldtype'] = 'mediumint'
 					args['length'] = ''
 					args['keys'] += ' auto_increment'
@@ -142,38 +142,40 @@ def create_table(conn, doclistobj):
 		
 
 	# add std columns
-	if doclistobj.get("std_fields") != "No":
+	if doctype.get("std_fields") != "No":
 		for d in std_columns:
 			column_def()
 
 		# is table
-		for d in (doclistobj.get('istable') and std_columns_table or std_columns_main):
+		for d in (doctype.get('istable') and std_columns_table or std_columns_main):
 			column_def()
 
 	# fields
-	for d in doclistobj.get({"doctype":"DocField"}):
+	for d in doctype.get({"doctype":"DocField"}):
 		column_def()
 	
 	# indexes
-	for i in doclistobj.get('indexes', []):
+	for i in doctype.get('indexes', []):
 		constraints.append("index `%s`(%s)" % (wn.code_style(i), i))
 	
 	# run the query!
-	query = template % (doclistobj.get('name'), ',\n'.join(columns + constraints))	
+	query = template % (doctype.get('name'), ',\n'.join(columns + constraints))	
 	
 	#print query
 	
 	conn.sql("""set foreign_key_checks=0""")
 	try:
+		if doctype.get('name') in conn.get_tables():
+			conn.sql("""drop table `%s`""" % doctype.get('name'))
 		conn.sql(query)
 	finally:
 		conn.sql("""set foreign_key_checks=1""")	
 
-def remake_table(conn, doclistobj):
+def remake_table(conn, doctype):
 	"""drop table and remake it, backing up the data first"""
 	import utils, os
 	
-	name = doclistobj.get('name')
+	name = doctype.get('name')
 	data = conn.sql("""select * from `%s`""" % name, as_dict=1)
 	fname = utils.random_string(15) + '.txt'
 	with open(fname, 'w') as tmpfile:
@@ -182,7 +184,7 @@ def remake_table(conn, doclistobj):
 	conn.sql("""set foreign_key_checks=0""")	
 	conn.sql("""drop table `%s`""" % name)
 	
-	make_table(doclistobj)
+	make_table(doctype)
 	conn.sql("""set foreign_key_checks=0""")	
 	
 	with open(fname, 'r') as tmpfile:

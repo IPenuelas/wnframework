@@ -3,15 +3,16 @@ import unittest, sys
 sys.path.append('controllers')
 sys.path.append('lib')
 
-import wn
-import wn.backends, wn.model
+import wn, wn.model, wn.install
 import conf
+
 
 class TestMySQLObj(unittest.TestCase):
 	def setUp(self):
-		self.conn = wn.backends.get('mysql_obj', user='root', password=conf.db_root_password)
-		self.conn.create_user_and_database('test1', 'test1')
-		self.conn.create_table(wn.model.get('DocType', '_statement'))
+		conf.db_name = 'test1'
+		wn.install.setup_db()
+		wn.model.get('DocType', '_statement').setup()
+		self.conn = wn.backends.get('mysql_obj')
 
 	def tearDown(self):
 		self.conn.sql("drop database test1")

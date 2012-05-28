@@ -7,20 +7,27 @@ class MySQLBackend():
 	def __init__(self, host=None, user=None, password=None, db_name=None):
 		"""create connection and use database if not root"""
 		import MySQLdb, conf
-		
-		if not db_name:
-			db_name = user or getattr(conf, 'db_name')
-		
-		self.conn = MySQLdb.connect(host=host or getattr(conf, 'db_host', 'localhost'), 
-			user = user or db_name,
-			passwd = password or getattr(conf, 'db_password'))
+
+		if not user:
+			user = getattr(conf, 'user', conf.db_name)
+			
+		if user=='root' and not password:
+			password = conf.db_root_password
+			
+		if not password:
+			password = getattr(conf, 'db_password')
+					
+		self.conn = MySQLdb.connect(host=(host or getattr(conf, 'db_host', 'localhost')), 
+			user = user, passwd = password)
 	
 		self.conn.converter[246]=float
 		self.conn.set_character_set('utf8')
 		self.cursor = self.conn.cursor()
-		
-		if db_name!='root':
+
+		if db_name: 
 			self.use(db_name)
+		elif user!='root':
+			self.use(user)
 		
 	def use(self, db_name):
 		"""switch to database db_name"""
@@ -155,8 +162,8 @@ class MySQLBackend():
 		import warnings
 		with warnings.catch_warnings(record=True) as w:
 			obj = self.filter_columns(doc)
-			self.sql("""insert into `%s` (%s) values (%s)""" % (doc.get('doctype'), 
-				', '.join(obj.keys()), (', %s' * len(obj.keys()))[2:]), obj.values())
+			self.sql("""insert into `%s` (`%s`) values (%s)""" % (doc.get('doctype'), 
+				'`, `'.join(obj.keys()), (', %s' * len(obj.keys()))[2:]), obj.values())
 
 			# raise exception if mandatory is not 
 			if w and (str(w[0].message).endswith('default value')):
@@ -211,6 +218,10 @@ class MySQLBackend():
 		"""get list of tables"""
 		return [c[0] for c in self.sql("show tables", as_list=True)]
 	
+	def get_databases(self):
+		"""get list of databases"""
+		return [c[0] for c in self.sql("show databases", as_list=True)]
+	
 	def create_user_and_database(self, db_name=None, password=None, user=None):
 		"""create MySQL db with user and database as `db_name` and password as `db_password`"""
 		import conf
@@ -226,12 +237,13 @@ class MySQLBackend():
 			if e.args[0]!=1396: raise e
 
 		self.sql("create user %s@'localhost' identified by %s", (user, password))
-		self.sql("create database if not exists `%s`" % db_name)
+		if not db_name in self.get_databases():
+			self.sql("create database `%s`" % db_name)
 		self.sql("grant all privileges on `%s` . * to '%s'@'localhost'" % (user, db_name))
 		self.sql("flush privileges")
 		self.sql("use `%s`" % db_name)
 	
-	def create_table(self, doclist):
+	def setup(self, doclist):
 		"""create table"""
 		from wn.backends import mysql_schema
 		mysql_schema.create_table(self, doclist)
@@ -241,3 +253,4 @@ class MySQLBackend():
 
 		import wn.backends
 		del wn.backends.connections[self.backend_type]
+		

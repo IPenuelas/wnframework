@@ -1,7 +1,7 @@
 [
  {
   "name":"_statement",
-  "type":"DocType",
+  "doctype":"DocType",
   "std_fields": "No",
   "indexes": ["name", "`name`, `key`"]
  },

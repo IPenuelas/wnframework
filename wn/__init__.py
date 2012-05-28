@@ -10,7 +10,7 @@ def code_style(txt):
 	"""return code friendly names"""
 	txt = txt.replace(' ', '_')
 	import re
-	return re.sub("[^a-zA-Z0-9_]", '', txt)
+	return re.sub("[^a-zA-Z0-9_]", '', txt).lower()
 
 def traceback():
 	"""Returns the traceback of the Exception"""

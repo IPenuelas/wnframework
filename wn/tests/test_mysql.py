@@ -4,20 +4,20 @@ sys.path.append('controllers')
 sys.path.append('lib')
 
 import wn
-import wn.backends
+import wn.backends, wn.install
 import conf
 
 class TestMySQL(unittest.TestCase):
 	def setUp(self):
-		a = wn
-		self.conn = wn.backends.get('mysql', user='root', password=conf.db_root_password)
-		self.conn.create_user_and_database('test1', 'test1')
+		conf.db_name = 'test1'
+		wn.install.setup_db()
+		self.conn = wn.backends.get('mysql')
 
 	def tearDown(self):
-		self.conn.sql("drop database test1")
 		self.conn.close()
+		wn.install.remove()
 	
-	def test_create_table(self):
+	def test_setup(self):
 		from wn.model import DocList
 		table_def = DocList([{"doctype":"DocType", "name":"Test"},
 		{"doctype":"DocField", "fieldtype":"Data", "fieldname":"test_data", "reqd":1},
@@ -27,17 +27,17 @@ class TestMySQL(unittest.TestCase):
 		{"doctype":"DocField", "fieldtype":"Float", "fieldname":"test_float"},
 		{"doctype":"DocField", "fieldtype":"Currency", "fieldname":"test_currency"},
 		])
-		self.conn.create_table(table_def)
+		self.conn.setup(table_def)
 		self.assertTrue("Test" in self.conn.get_tables())
 	
 	def test_insert(self):
-		self.test_create_table()
+		self.test_setup()
 		rec = {"doctype":"Test", "name":"r1", "test_data":"hello"}
 		self.conn.insert(rec)
 		self.assertEquals(self.conn.get("Test", "r1")[0].get("test_data"), rec.get("test_data"))
 	
 	def test_mandatory(self):
-		self.test_create_table()
+		self.test_setup()
 		rec = {"doctype":"Test", "name":"r1"}
 		self.assertRaises(wn.ValidationError, self.conn.insert, (rec))
 	

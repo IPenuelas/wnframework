@@ -9,9 +9,13 @@ class FilesBackend:
 	cache = {}
 	def doc_path(self, doctype_name, name):
 		"""get docpath"""
-		import wn, os
-		start = os.path.join(wn.root_path, 'documents')
-		return os.path.join(start, wn.code_style(doctype_name), wn.code_style(name) + '.json')
+		import wn, os, conf
+		for p in conf.doc_path:
+			path = os.path.join(wn.root_path, p, wn.code_style(doctype_name), wn.code_style(name) + '.json')
+			if os.path.exists(path):
+				return path
+				
+		raise wn.NotFoundError, 'Not found ".json" file for %s, %s' % (doctype_name, name)
 				
 	def strip_values(self, doclist):
 		"""reduce fields before writing in document file"""
@@ -33,9 +37,13 @@ class FilesBackend:
 		self.cache.setdefault(doclist[0]['doctype'], {})[doclist[0]['name']] = doclist
 		
 	def insert_doclist(self, doclist):
-		import json
+		"""add a new files in the 'documents' folder"""
+		import json, wn, os
 		self.strip_values(doclist)
-		with open(self.doc_path(doclist[0]['doctype'], doclist[0]['name']), 'w') as jsonfile:
+		
+		fpath = os.path.join(wn.root_path, 'documents', wn.code_style(doclist[0]['doctype']),
+			wn.code_style(doclist[0]['name']) + '.json')
+		with open(fpath, 'w') as jsonfile:
 			jsonfile.write(json.dumps(doclist, indent=1))
 		self.add_to_cache(doclist)
 	
@@ -53,9 +61,13 @@ class FilesBackend:
 		fpath = self.doc_path(doctype_name, name)
 		if os.path.exists(fpath):
 			with open(fpath, 'r') as jsonfile:
-				doclist = json.loads(jsonfile.read())
-				self.add_to_cache(doclist)
-				return doclist
+				try:
+					doclist = json.loads(jsonfile.read())
+					self.add_to_cache(doclist)
+					return doclist
+				except Exception, e:
+					print "JSON parse error: " + fpath
+					raise e
 		else:
 			return []
 			
@@ -74,3 +86,9 @@ class FilesBackend:
 		fpath = self.doc_path(doctype_name, name)
 		if os.path.exists(fpath):
 			os.remove(fpath)
+
+	def setup(self, doclist):
+		pass
+		
+	def close(self):
+		pass

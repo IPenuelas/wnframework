@@ -40,8 +40,4 @@ class TestFiles(unittest.TestCase):
 		
 		
 if __name__=='__main__':
-	try:
-		unittest.main()
-	finally:
-		if wn.messages:
-			print wn.messages
+	unittest.main()

@@ -9,24 +9,90 @@ def application(environ, start_response):
 	wn.request = Request(environ)
 	wn.response = AppResponse()
 	try:
-		handle()
-		wn.response.make()
+		wn.response.prepare()
+		wn.response.process()
+		wn.response.cleanup()
 	except Exception, e:
 		wn.response.body = wn.traceback()
 
 	return wn.response(environ, start_response)
 
 class AppResponse(Response):
-	"""attach set json, csv response types"""
+	"""	AppResponse executes the request:
+		- loads the session (or guest)
+		- gets execution method `_method` from request
+		- checks if whitelisted
+		- starts transaction if post
+		- passes control to `_method`
+		- commits
+		"""
 	json = {}
-	messages = []
-	errors = []
-	logs = []
+	messages, errors, logs, info = [], [], [], []
+	
 	def error(self, txt): self.errors.append(txt)
 	def message(self, txt): self.messages.append(txt)
 	def log(self, txt): self.logs.append(txt)
+	def write(self, txt): self.info.append(txt)
 
-	def make(self):
+	def prepare(self):
+		"""load session from cookie or parameter"""
+		wn.sid = wn.request.cookies.get('sid') or wn.request.params.get('sid') or 'guest'
+		
+		def new_session():
+			self.session = wn.model.new([{"doctype":"_session", "user":"Guest"}])
+		
+		if wn.sid:
+			try:
+				self.session = wn.model.get("_session", wn.sid)
+			except wn.NotFoundError:
+				new_session()
+		else:
+			new_session()
+
+	def get_method(self):
+		"""get execution method"""
+		# check for "_method"
+		if not '_method' in wn.request.params:
+			self.error('no method')
+			return
+		
+		# import module
+		m = wn.request.params['_method'].split('.')
+		module_name = '.'.join(m[:-1])
+		try:
+			module = __import__(module_name, fromlist=True)
+		except Exception,e:
+			self.error('unable to import %s' % module_name)
+			return
+		
+		# get method
+		method = getattr(module, m[-1], None)
+		if not method:
+			self.error('no method %s' % m[-1])
+			return
+		
+		# check if its whitelisted
+		if not method in whitelisted:
+			self.error('method not allowed')
+			return
+
+		return method
+			
+	def process(self):
+		"""process the response, call the specified method"""
+		method = self.get_method()
+		conn = wn.backends.get('mysql')
+		if method:
+			# execute
+			try:
+				wn.request.method=='POST' and conn.begin()
+				method()
+				wn.request.method=='POST' and conn.commit()
+			except Exception, e:
+				wn.request.method=='POST' and conn.rollback()
+				wn.response.error(wn.traceback())		
+
+	def cleanup(self):
 		"""make response body"""
 		if self.messages:
 			self.json['messages'] = self.messages
@@ -34,30 +100,12 @@ class AppResponse(Response):
 			self.json['errors'] = self.errors
 		if self.logs:
 			self.json['logs'] = self.logs
+		if self.info:
+			self.json['info'] = self.info
 		if self.json:
 			import json
 			self.body = json.dumps(self.json, default=json_type_handler)
-			
-def handle():
-	"""handle method"""
-	load_session()
-	if '_method' in wn.request.params:
-		try:
-			m = wn.request.params['_method'].split('.')
-			method = getattr(__import__('.'.join(m[:-1]), fromlist=True), m[-1])
-		except Exception, e:
-			wn.response.error('method not found')
-		if not method in whitelisted:
-			wn.response.error('method not allowed')
-		else:
-			method()
-	else:
-		wn.response.error('no method')	
 
-def load_session():
-	"""load session from cookie or parameter"""
-	wn.sid = wn.request.cookies.get('sid') or wn.request.params.get('sid') or 'guest'
-	wn.session = wn.model.get('Session', wn.sid) or wn.model.DocList([{'user':'Guest'}])
 
 whitelisted = []
 guest_methods = []
@@ -89,5 +137,30 @@ def json_type_handler(obj):
 	"""convert datetime objects to string"""
 	if hasattr(obj, 'strftime'):
 		return str(obj)
-		
+
+@whitelist(allow_guest=True)
+def login():
+	"""verify login creds and create a session"""
+	if wn.model.get_value('User', wn.request.params['user'], 'password')==wn.request.params['password']:
+		session = wn.model.new('_session')
+		session.insert()
+		wn.response.write('Logged In')
+		wn.response.set_cookie('sid', session.get('name'), path='/')
+	else:
+		wn.response.write('Incorrect Login')
 	
+@whitelist()
+def logout():
+	"""clear session"""
+	if getattr(wn, 'sid', None):
+		wn.model.remove('_session', wn.sid)
+		wn.response.write('Logged Out')
+		
+def test(url):
+	"""test method"""
+	wn.request = Request.blank(url)
+	wn.response = AppResponse()
+	wn.response.prepare()
+	wn.response.process()
+	wn.response.cleanup()
+	return wn.response.json

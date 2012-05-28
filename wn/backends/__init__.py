@@ -36,3 +36,8 @@ def get_for(doctype):
 		return get('files')
 	else:
 		return get('mysql')
+		
+def close():
+	clist = connections.values()
+	for conn in clist:
+		conn.close()
